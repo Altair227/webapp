@@ -2,6 +2,7 @@ import asyncio
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+import app.models
 from alembic import context
 from app.config import get_config
 from app.models.base import Base
@@ -9,7 +10,7 @@ from app.models.base import Base
 
 config = context.config
 app_config = get_config()
-config.set_main_option('sqlalchemy.url', app_config.postgres.dsn)
+config.set_main_option("sqlalchemy.url", app_config.postgres.dsn)
 
 target_metadata = Base.metadata
 
@@ -34,7 +35,7 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         render_as_batch=True,
-        compare_type=True
+        compare_type=True,
     )
 
     with context.begin_transaction():
