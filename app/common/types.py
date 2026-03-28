@@ -10,6 +10,12 @@ class UserType(IntEnum):
     ADMIN = 1
 
 
+class AdminType(IntEnum):
+    SUPER_ADMIN = 0
+    ADMIN = 1
+    MODERATOR = 2
+
+
 class SmallIntEnum(TypeDecorator[IntEnum]):
     """
     SQLAlchemy TypeDecorator для IntEnum -> SMALLINT маппинга.
