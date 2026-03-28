@@ -8,6 +8,22 @@ ENV_FILE = Path(__file__).parent / ".env"
 load_dotenv(str(ENV_FILE))
 
 
+class LoggerConfig(BaseSettings):
+    level: str = "DEBUG"
+    dir: str | None = None
+    size: int = 0
+    count: int = 0
+    format: str = "%(asctime)s - %(name)s - %(levelname)s - %(filename)s: %(lineno)d - %(message)s"
+    date_format: str = "%Y-%m-%d %H:%M:%S"
+    model_config = SettingsConfigDict(
+        env_prefix="LOG_",
+        env_file=ENV_FILE,
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
+
+
 class PostgresConfig(BaseSettings):
     db: str
     user: str
@@ -50,7 +66,7 @@ class SqliteConfig(BaseSettings):
 class Config(BaseSettings):
     sqlite: SqliteConfig = Field(default_factory=SqliteConfig)
     postgres: PostgresConfig = Field(default_factory=PostgresConfig)
-
+    logger: LoggerConfig = Field(default_factory=LoggerConfig)
     model_config = SettingsConfigDict(
         env_file=ENV_FILE,
         env_file_encoding="utf-8",

@@ -22,6 +22,17 @@ services:
           memory: 1G
         reservations:
           memory: 512M
+
+  prettier:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ../app:/app
+    command: sh -c "npm install -g prettier && npx prettier --write . --parser css"
+    user: "${UID}:${GID}"
+
+
+
 networks:
   crm-network:
     driver: bridge
