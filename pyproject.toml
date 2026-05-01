@@ -3,6 +3,10 @@ name = "WebApp"
 version = "0.1.0"
 description = "This is my first webapp"
 dependencies = [
+    "psycopg2-binary",
+    "bcrypt",
+    "email-validator==2.3.0",
+    "Flask-WTF==1.2.2",
     "alembic==1.18.1",
     "annotated-types==0.7.0",
     "librt==0.7.8",

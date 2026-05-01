@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 from pathlib import Path
 from dotenv import load_dotenv
@@ -34,7 +35,7 @@ class PostgresConfig(BaseSettings):
     @property
     def dsn(self) -> str:
         return (
-            f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}"
+            f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}"
             f":{self.port}/{self.db}"
         )
 
@@ -67,6 +68,7 @@ class Config(BaseSettings):
     sqlite: SqliteConfig = Field(default_factory=SqliteConfig)
     postgres: PostgresConfig = Field(default_factory=PostgresConfig)
     logger: LoggerConfig = Field(default_factory=LoggerConfig)
+    secret_key: str = "default_secret_key"
     model_config = SettingsConfigDict(
         env_file=ENV_FILE,
         env_file_encoding="utf-8",

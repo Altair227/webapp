@@ -48,5 +48,5 @@ class UserData(Base):
     )
     user: Mapped["User"] = relationship(
         "User",
-        back_populates="user_data",
+        back_populates="data",
     )

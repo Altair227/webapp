@@ -1,0 +1,48 @@
+{% extends "admin/auth.html" %}
+{% block content %}
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+        <div class="form-floating">
+            {{ form.email(
+                class="form-control" ~ (" is-invalid" if form.email.errors else (" is-valid" if form.is_submitted() else "")),
+                placeholder="name@example.com"
+            ) }}
+            <label>{{ form.email.label }}</label>
+            {% if form.email.errors %}
+            <div class="invalid-feedback">
+                {{form.email.errors[0]}}
+            </div>
+            {% endif %}
+        </div>
+        <div class="form-floating">
+            {{ form.password(
+                class="form-control" ~ (" is-invalid" if form.password.errors else (" is-valid" if form.is_submitted() else "")),
+                placeholder="enter your password"
+            ) }}
+            <label>{{ form.password.label }}</label>
+            {% if form.password.errors %}
+            <div class="invalid-feedback">
+                {{form.password.errors[0]}}
+            </div>
+            {% endif %}
+        </div>
+        <div class="form-check text-start my-3">
+            {{ form.remember_me(class="form-check-input") }}
+            <label class="form-check-label">
+                {{ form.remember_me.label }}
+            </label>
+        </div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="alert alert-danger">
+                {% for message in messages %}
+                    <div>- {{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+        <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+    </form>
+
+{% endblock %}

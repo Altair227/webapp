@@ -42,5 +42,5 @@ class AdminData(Base):
     )
     admin: Mapped["Admin"] = relationship(
         "Admin",
-        back_populates="admin_data",
+        back_populates="data",
     )

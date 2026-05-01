@@ -1,4 +1,4 @@
-.PHONY: format migrate-create migrate-up run
+.PHONY: format migrate-create migrate-up run install
 
 format:
 	@echo "formating..." ; \
@@ -20,3 +20,6 @@ migrate-up:
 
 run:
 	HOST=0.0.0.0 PORT=9000 python run.py
+
+install:
+	uv pip install -r pyproject.toml
