@@ -29,3 +29,15 @@ class LoginForm(FlaskForm):
         label="Remember me",
         default=False,
     )
+
+
+class ForgotForm(FlaskForm):
+    email = EmailField(
+        label="Email",
+        validators=[
+            DataRequired(),
+            Email(
+                message="Invalid email format",
+            ),
+        ],
+    )

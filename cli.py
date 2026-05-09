@@ -31,17 +31,16 @@ def _create_superadmin() -> None:
                 is_activated=True,
                 is_blocked=False,
                 is_deleted=False,
-
             )
         )
-        action='Created'
+        action = "Created"
     else:
         admin.password_hash = password_hash
         admin.type = AdminType.SUPER_ADMIN
         admin.is_activated = True
         admin.is_blocked = False
         admin.is_deleted = False
-        action='Updated'
+        action = "Updated"
     db_session.commit()
     print(f"{action} superadmin:")
     print(f"  Email:    {email}")

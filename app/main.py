@@ -5,6 +5,7 @@ from app.config import get_config
 from app.utils.logger import init_logger
 from app.utils.modules import register_child_blueprints
 import app.modules as app_pkg
+from app.utils.mailer import get_mailer
 
 
 def create_app() -> Flask:
@@ -16,7 +17,15 @@ def create_app() -> Flask:
         static_folder="assets",
         static_url_path="/static",
     )
+    app.config['MAIL_SERVER'] = config.mailer.host
+    app.config['MAIL_PORT'] = config.mailer.port
+    app.config['MAIL_USE_TLS'] = config.mailer.tls
+    app.config['MAIL_USERNAME'] = config.mailer.user
+    app.config['MAIL_PASSWORD'] = config.mailer.password
+    mailer=get_mailer()
+    mailer.init_app(app)
     register_child_blueprints(app, app_pkg, routes_module_name="main")
+
 
     app.logger.handlers = logger.handlers
     app.logger.setLevel(logger.level)

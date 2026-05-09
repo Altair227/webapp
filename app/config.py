@@ -1,8 +1,7 @@
-import os
 from functools import lru_cache
 from pathlib import Path
 from dotenv import load_dotenv
-from pydantic import Field
+from pydantic import Field, AliasChoices
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ENV_FILE = Path(__file__).parent / ".env"
@@ -24,6 +23,24 @@ class LoggerConfig(BaseSettings):
         extra="ignore",
     )
 
+
+class MailerConfig(BaseSettings):
+    host: str = "localhost"
+    port: int = 1025
+    user: str = ""
+    password: str = ""
+    sender: str | None = Field(
+        default="noreply@localhost",
+        validation_alias=AliasChoices("SMTP_FROM", "smtp_from"),
+    )
+    tls: bool = False
+    model_config = SettingsConfigDict(
+        env_prefix="SMTP_",
+        env_file=ENV_FILE,
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
 class PostgresConfig(BaseSettings):
     db: str
@@ -69,6 +86,7 @@ class Config(BaseSettings):
     postgres: PostgresConfig = Field(default_factory=PostgresConfig)
     logger: LoggerConfig = Field(default_factory=LoggerConfig)
     secret_key: str = "default_secret_key"
+    mailer: MailerConfig = Field(default_factory=MailerConfig)
     model_config = SettingsConfigDict(
         env_file=ENV_FILE,
         env_file_encoding="utf-8",

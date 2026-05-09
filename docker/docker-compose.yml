@@ -31,8 +31,16 @@ services:
     command: sh -c "npm install -g prettier && npx prettier --write . --parser css"
     user: "${UID}:${GID}"
 
-
+  mailpit:
+    container_name: lms-mailpit
+    image: axllent/mailpit
+    networks:
+      - crm-network
+    ports:
+      - "8025:8025"
+      - "1025:1025"
 
 networks:
   crm-network:
     driver: bridge
+
