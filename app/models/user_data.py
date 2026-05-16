@@ -11,12 +11,7 @@ if TYPE_CHECKING:
 
 class UserData(Base):
     __tablename__ = "user_data"
-    id: Mapped[int] = mapped_column(
-        Integer,
-        primary_key=True,
-        autoincrement=True,
-        comment="",
-    )
+
     user_id: Mapped[int] = mapped_column(
         ForeignKey(
             "users.id",

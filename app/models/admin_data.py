@@ -10,12 +10,7 @@ if TYPE_CHECKING:
 
 class AdminData(Base):
     __tablename__ = "admin_data"
-    id: Mapped[int] = mapped_column(
-        Integer,
-        primary_key=True,
-        autoincrement=True,
-        comment="",
-    )
+
     admin_id: Mapped[int] = mapped_column(
         ForeignKey(
             "admins.id",

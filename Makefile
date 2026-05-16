@@ -1,4 +1,4 @@
-.PHONY: format migrate-create migrate-up run install
+.PHONY: format migrate-create migrate-up migrate-down run install
 
 format:
 	@echo "formating..." ; \
@@ -17,6 +17,8 @@ migrate-create:
 migrate-up:
 	@alembic upgrade head
 
+migrate-down:
+	@alembic downgrade -1
 
 run:
 	HOST=0.0.0.0 PORT=9000 python run.py

@@ -42,6 +42,7 @@ class MailerConfig(BaseSettings):
         extra="ignore",
     )
 
+
 class PostgresConfig(BaseSettings):
     db: str
     user: str

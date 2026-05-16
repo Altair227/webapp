@@ -36,3 +36,8 @@ def forgot():
     return render_template(
         "admin_auth/forgot.html", form=form, is_sent=is_sent
     )
+
+
+@bp.route("/restore",methods=["GET"])
+def restore():
+    pass

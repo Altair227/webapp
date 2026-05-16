@@ -17,15 +17,16 @@ def create_app() -> Flask:
         static_folder="assets",
         static_url_path="/static",
     )
-    app.config['MAIL_SERVER'] = config.mailer.host
-    app.config['MAIL_PORT'] = config.mailer.port
-    app.config['MAIL_USE_TLS'] = config.mailer.tls
-    app.config['MAIL_USERNAME'] = config.mailer.user
-    app.config['MAIL_PASSWORD'] = config.mailer.password
-    mailer=get_mailer()
+    app.config["MAIL_SERVER"] = config.mailer.host
+    app.config["MAIL_PORT"] = config.mailer.port
+    app.config["MAIL_USE_TLS"] = config.mailer.tls
+    app.config["MAIL_USERNAME"] = config.mailer.user
+    app.config["MAIL_PASSWORD"] = config.mailer.password
+    app.config["MAIL_DEFAULT_SENDER"] = config.mailer.sender
+    mailer = get_mailer()
     mailer.init_app(app)
     register_child_blueprints(app, app_pkg, routes_module_name="main")
-
+    print(config.mailer)
 
     app.logger.handlers = logger.handlers
     app.logger.setLevel(logger.level)

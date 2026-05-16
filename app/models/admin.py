@@ -11,12 +11,7 @@ if TYPE_CHECKING:
 
 class Admin(Base):
     __tablename__ = "admins"
-    id: Mapped[int] = mapped_column(
-        Integer,
-        primary_key=True,
-        autoincrement=True,
-        comment="",
-    )
+
     email: Mapped[str] = mapped_column(
         EmailType,
         unique=True,

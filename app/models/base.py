@@ -1,12 +1,19 @@
 from datetime import datetime, UTC
 from typing import Any
-from sqlalchemy import Boolean, DateTime, event, func
+from sqlalchemy import Boolean, DateTime, event, func, Integer
+
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import DeclarativeBase, Mapped, Mapper, mapped_column
 
 
 class Base(DeclarativeBase):
     __abstract__ = True
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+        comment="",
+    )
     is_deleted: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False, comment=""
     )

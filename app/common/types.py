@@ -16,6 +16,15 @@ class AdminType(IntEnum):
     MODERATOR = 2
 
 
+class EntityType(IntEnum):
+    USER = 1
+    ADMIN = 2
+
+
+class EmailTokenType(IntEnum):
+    PASSWORD_RESET = 1
+
+
 class SmallIntEnum(TypeDecorator[IntEnum]):
     """
     SQLAlchemy TypeDecorator для IntEnum -> SMALLINT маппинга.
