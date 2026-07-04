@@ -8,4 +8,4 @@ PORT = int(os.getenv("PORT", "8000"))
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(host=HOST, port=PORT, debug=True)
+    app.run(host=HOST, port=PORT, debug=True, use_reloader=False)

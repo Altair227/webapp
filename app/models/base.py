@@ -1,9 +1,22 @@
 from datetime import datetime, UTC
 from typing import Any
-from sqlalchemy import Boolean, DateTime, event, func, Integer
-
+from sqlalchemy import Boolean, DateTime, event, func, Integer, inspect
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import DeclarativeBase, Mapped, Mapper, mapped_column
+
+
+def get_sortable_columns(model):
+    return {c.key: getattr(model, c.key) for c in inspect(model).columns}
+
+
+def to_dict(model, exclude=None):
+    if not exclude:
+        exclude = set()
+    return {
+        c.key: getattr(model, c.key)
+        for c in inspect(model).mapper.column_attrs
+        if c.key not in exclude
+    }
 
 
 class Base(DeclarativeBase):

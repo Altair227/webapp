@@ -1,16 +1,52 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>{% block title %}Admin{% endblock %}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/air-datepicker/air-datepicker.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/quill/dist/quill.snow.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+
+    <title>{% block title %}Dashboard{% endblock %} - Admin</title>
+
+    {% block head %}{% endblock %}
 </head>
 <body>
-    <header>
-        <h1>Admin panel</h1>
-    </header>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/admin">Blog</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-2"></i>
+                            {{ request.user.email if request.user else 'Admin' }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="/admin/auth/logout">Выход</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div id="content" class="container-fluid mt-4">
+        {% block layout %}{% endblock %}
+    </div>
+    <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/tabulator-tables/dist/js/tabulator.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/quill/dist/quill.js') }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/air-datepicker/air-datepicker.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

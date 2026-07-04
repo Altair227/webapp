@@ -2,7 +2,8 @@
 
 format:
 	@echo "formating..." ; \
-	ruff format .;
+	ruff format .; \
+	docker-compose -f docker/docker-compose.yml --project-directory docker run --rm prettier
 
 
 migrate-create:

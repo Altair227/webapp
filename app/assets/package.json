@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "air-datepicker": "^3.6.0",
+    "bootstrap": "^5.3.8",
+    "quill": "^2.0.2",
+    "tabulator-tables": "^6.5.2"
+  }
+}

@@ -1,0 +1,57 @@
+<form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            {% for field_name, errors in form.errors.items() %}
+                {% for error in errors %}
+                    <li>
+                        <strong>{{ form[field_name].label.text }}:</strong>
+                        {{ error }}
+                    </li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% with messages = get_flashed_messages() %} {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                <div>- {{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %} {% endwith %}
+    <div class="mb-3">
+        <label for="{{form.title.id}}" class="form-label">
+            {{ form.title.label }}
+        </label>
+        {{ form.title( class="form-control" ~ (" is-invalid" if form.title.errors
+        else (" is-valid" if form.is_submitted() else ""))) }}
+    </div>
+    <div class="mb-3">
+        <label for="{{form.description.id}}" class="form-label">
+            {{ form.description.label }}
+        </label>
+        {{ form.description( rows=5, class="form-control" ~ (" is-invalid" if form.description.errors
+        else (" is-valid" if form.is_submitted() else ""))) }}
+    </div>
+    <div class="mb-3">
+        <label for="{{form.content.id}}" class="form-label">
+            {{ form.content.label }}
+        </label>
+        {{ form.content( rows=5, class="form-control" ~ (" is-invalid" if form.content.errors
+        else (" is-valid" if form.is_submitted() else ""))) }}
+    </div>
+    <div class="mb-3">
+    <label for="{{ form.published_at.id }}" class="form-label">
+        {{ form.published_at.label }}
+    </label>
+        {{ form.published_at( class="form-control" ~ ( " is-invalid" if form.published_at.errors
+        else (" is-valid" if form.is_submitted() else ""))) }}
+    </div>
+    {% if is_create %}
+    <button class="btn btn-primary" type="submit">Create</button>
+    {% else %}
+    <button class="btn btn-success" type="submit">Save</button>
+    {% endif %}
+</form>

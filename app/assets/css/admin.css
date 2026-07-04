@@ -18,3 +18,15 @@
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+#navigation .dropdown:hover > .dropdown-menu {
+    display: block;
+    margin-top: 0;
+
+
+}
+
+textarea{
+resize: none;
+
+}

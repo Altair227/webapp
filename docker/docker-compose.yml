@@ -28,7 +28,7 @@ services:
     working_dir: /app
     volumes:
       - ../app:/app
-    command: sh -c "npm install -g prettier && npx prettier --write . --parser css"
+    command: sh -c "npm install -g prettier && prettier --write '**/*.html **/*.css'"
     user: "${UID}:${GID}"
 
   mailpit:

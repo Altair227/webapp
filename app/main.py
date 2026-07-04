@@ -17,6 +17,7 @@ def create_app() -> Flask:
         static_folder="assets",
         static_url_path="/static",
     )
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["MAIL_SERVER"] = config.mailer.host
     app.config["MAIL_PORT"] = config.mailer.port
     app.config["MAIL_USE_TLS"] = config.mailer.tls
@@ -46,6 +47,10 @@ def create_app() -> Flask:
 
     @app.errorhandler(404)
     def error_404(error):
-        return render_template("errors/404.html"), 404
+        return render_template("errors/404.html", error=error), 404
+
+    @app.errorhandler(400)
+    def error_400(error):
+        return render_template("errors/400.html", error=error), 400
 
     return app

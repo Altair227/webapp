@@ -1,8 +1,71 @@
-{% extends "admin/base.html" %}
-
-{% block title %}Admin News{% endblock %}
-
+{% extends "admin/layout.html" %}
+{%- block title -%}Admin News{%- endblock -%}
 {% block content %}
-    <h2>Admin news page</h2>
-    <p>Новости административной части.</p>
+<h2>Admin news page</h2>
+<div id="news-content"></div>
+<script>
+    const format_date = (cell) => {
+        let value = cell.getValue();
+        if (!value) return "";
+
+        let date = new Date(value);
+
+        if (isNaN(date.getTime())) return "";
+
+        let year = date.getFullYear();
+        let month = String(date.getMonth() + 1).padStart(2, '0');
+        let day = String(date.getDate()).padStart(2, '0');
+        let hours = String(date.getHours()).padStart(2, '0');
+        let minutes = String(date.getMinutes()).padStart(2, '0');
+        let seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    };
+    document.addEventListener('DOMContentLoaded', event => {
+        const table = new Tabulator("#news-content", {
+            ajaxURL: "{{ url_for('admin.admin_news.search') }}",
+            pagination: true,
+            paginationMode: "remote",
+            paginationSize: 25,
+            sortMode: "remote",
+            columns: [
+                { title: "ID", field: "id", width: 80 },
+                { title: "Title", field: "title",  },
+                {
+                    title: "Published",
+                    field: "published_at",
+                    sorter: "datetime",
+                    formatter: format_date
+
+                },
+                {
+                    title: "Created",
+                    field: "created_at",
+                    sorter: "datetime",
+                    formatter: format_date
+                },
+                {
+                    title: "Updated",
+                    field: "updated_at",
+                    sorter: "datetime",
+                    formatter: format_date
+                },
+                {
+                    title: "Deleted",
+                    field: "is_deleted",
+                    sorter: "boolean",
+                    cssClass: "text-center",
+                    formatter: function(cell){
+                        const value = cell.getValue();
+                        if (value){
+                            return '<b class="bi bi-check text-success fs-3"></b>';
+                        } else {
+                            return '<b class="bi bi-x text-danger fs-3"></b>';
+                        }
+                    }
+                }
+            ],
+        });
+    });
+</script>
 {% endblock %}
