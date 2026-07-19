@@ -58,3 +58,28 @@ class NewsService:
             return None
         except Exception as e:
             return str(e)
+
+    @staticmethod
+    def get_by_id(_id: int) -> News | None:
+        return db_session.get(News, _id)
+
+    @staticmethod
+    def update(
+        _id: int,
+        title: str,
+        description: str,
+        content: str,
+        published_at: datetime | None = None,
+    ) -> str | None:
+        data = NewsService.get_by_id(_id)
+        if not data:
+            return 'News not found'
+        data.title=title
+        data.description=description
+        data.content=content
+        data.published_at=published_at
+        try:
+            db_session.commit()
+            return None
+        except Exception as e:
+            return str(e)

@@ -4,6 +4,7 @@
 <h2>Admin news page</h2>
 <div id="news-content"></div>
 <script>
+    const url_edit_template = "{{ url_for('admin.admin_news.update', _id='__ID__')}}";
     const format_date = (cell) => {
         let value = cell.getValue();
         if (!value) return "";
@@ -63,7 +64,27 @@
                             return '<b class="bi bi-x text-danger fs-3"></b>';
                         }
                     }
+                },
+                {
+                    title: "",
+                    headerSort: false,
+                    formatter: function(cell){
+                        const id = cell.getData().id;
+                        const url = url_edit_template.replace('__ID__', id);
+                        return '<a href="' + url + '">Edit</a>';
+
+
+
+
+
+
+                    }
+
+
+
+
                 }
+
             ],
         });
     });

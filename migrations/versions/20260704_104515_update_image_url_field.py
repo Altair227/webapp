@@ -42,5 +42,5 @@ def downgrade() -> None:
         comment=None,
         existing_comment="",
         existing_nullable=False,
-        nullable=False
+        nullable=False,
     )

@@ -6,7 +6,10 @@ from flask import (
     redirect,
     url_for,
     flash,
+    abort,
 )
+from mypyc.primitives.set_ops import new_set_op
+
 from app.modules.admin.decorators import auth_required
 from .services import NewsService
 from .forms import NewsForm
@@ -63,3 +66,26 @@ def create():
             return redirect(url_for("admin.admin_news.index"))
         flash(error, "error")
     return render_template("admin_news/create.html", form=form, is_create=True)
+
+
+@bp.route("/update/<_id>", methods=["GET", "POST"])
+@auth_required(True, "admin.admin_auth.login")
+def update(_id):
+    data = NewsService.get_by_id(int(_id))
+    if not data:
+        abort(404, description='News not found')
+    form = NewsForm(
+        obj=data
+    )
+    if form.validate_on_submit():
+        error = NewsService.update(
+            _id=data.id,
+            title=form.title.data,
+            description=form.description.data,
+            content=form.content.data,
+            published_at=form.published_at.data,
+        )
+        if not error:
+            return redirect(url_for("admin.admin_news.index"))
+        flash(error, "error")
+    return render_template("admin_news/update.html", form=form, is_create=False)
