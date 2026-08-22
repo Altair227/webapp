@@ -89,3 +89,41 @@ def update(_id):
             return redirect(url_for("admin.admin_news.index"))
         flash(error, "error")
     return render_template("admin_news/update.html", form=form, is_create=False)
+
+
+@bp.route("/remove/<_id>", methods=["DELETE"])
+@auth_required(True, "admin.admin_auth.login")
+def remove(_id):
+    message=NewsService.remove([_id])
+    if message:
+        abort(404, description=message)
+    return '', 200
+
+
+@bp.route("/bulk-remove", methods=["DELETE"])
+@auth_required(True, "admin.admin_auth.login")
+def bulk_remove():
+    ids = request.get_json(force=True).get("ids",[])
+    message=NewsService.remove(ids)
+    if message:
+        abort(404, description=message)
+    return '', 200
+
+
+@bp.route("/resume/<_id>", methods=["PUT"])
+@auth_required(True, "admin.admin_auth.login")
+def resume(_id):
+    message=NewsService.resume([_id])
+    if message:
+        abort(404, description=message)
+    return '', 200
+
+
+@bp.route("/bulk-resume", methods=["PUT"])
+@auth_required(True, "admin.admin_auth.login")
+def bulk_resume():
+    ids = request.get_json(force=True).get("ids", [])
+    message=NewsService.resume(ids)
+    if message:
+        abort(404, description=message)
+    return '', 200

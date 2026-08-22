@@ -2,9 +2,17 @@
 {%- block title -%}Admin News{%- endblock -%}
 {% block content %}
 <h2>Admin news page</h2>
+<a href="{{ url_for('admin.admin_news.create')}}" class="btn btn-success">Create news</a>
 <div id="news-content"></div>
+<div id="control" class="d-none">
+    <button class="btn btn-danger" data-action="delete">Delete</button>
+    <button class="btn btn-warning" data-action="resume">Resume</button>
+</div>
 <script>
+    const selected_ids = new Set();
     const url_edit_template = "{{ url_for('admin.admin_news.update', _id='__ID__')}}";
+    const url_remove_template = "{{ url_for('admin.admin_news.remove', _id='__ID__')}}";
+    const url_resume_template = "{{ url_for('admin.admin_news.resume', _id='__ID__')}}";
     const format_date = (cell) => {
         let value = cell.getValue();
         if (!value) return "";
@@ -23,6 +31,9 @@
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     };
     document.addEventListener('DOMContentLoaded', event => {
+        const update_action_buttons = () => {
+            document.getElementById("control").classList.toggle("d-none", !selected_ids.size);
+        };
         const table = new Tabulator("#news-content", {
             ajaxURL: "{{ url_for('admin.admin_news.search') }}",
             pagination: true,
@@ -30,6 +41,46 @@
             paginationSize: 25,
             sortMode: "remote",
             columns: [
+                {
+                    field: 'select',
+                    hozAlign: 'center',
+                    headerHozAlign: 'center',
+                    headerSort: false,
+                    width: 80,
+                    cellClick: (e, cell) => cell.getRow().toggleSelect(),
+                    formatter: (cell) => {
+                        const id = cell.getData().id;
+                        const input = document.createElement("input");
+                        input.type = "checkbox";
+                        input.className = "form-check-input";
+                        input.checked = selected_ids.has(id);
+                        input.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            input.checked ? selected_ids.add(id) : selected_ids.delete(id);
+                            update_action_buttons();
+                        });
+                        return input;
+                    },
+                    titleFormatter: () => {
+                        const input = document.createElement("input");
+                        input.type = "checkbox";
+                        input.className = "form-check-input";
+                        if (!selected_ids.size){
+                            input.checked=false;
+                        }
+                        input.addEventListener("click", () => {
+                            if (input.checked) {
+                                table.getData().forEach(row => selected_ids.add(row.id));
+                            } else {
+                                selected_ids.clear();
+                            }
+                            table.redraw(true);
+                            update_action_buttons();
+                        });
+                        return input;
+                    },
+                },
+
                 { title: "ID", field: "id", width: 80 },
                 { title: "Title", field: "title",  },
                 {
@@ -70,22 +121,112 @@
                     headerSort: false,
                     formatter: function(cell){
                         const id = cell.getData().id;
-                        const url = url_edit_template.replace('__ID__', id);
-                        return '<a href="' + url + '">Edit</a>';
-
-
-
-
-
-
+                        const is_deleted = cell.getData().is_deleted;
+                        if (is_deleted){
+                            const resume_url = url_resume_template.replace('__ID__', id);
+                            return  '<a ' +
+                                'data-confirm="Do you really want to resume these news?" ' +
+                                'data-title="Recovery news" ' +
+                                'data-button-ok="Recovery" ' +
+                                'data-method="PUT" ' +
+                                'href="' + resume_url + '">Resume</a>';
+                        }
+                        const edit_url = url_edit_template.replace('__ID__', id);
+                        const remove_url = url_remove_template.replace('__ID__', id);
+                        return '<a href="' + edit_url + '">Edit</a> | '
+                            + '<a ' +
+                            'data-confirm="Do you really want to remove these news?" ' +
+                            'data-title="Deleting news" ' +
+                            'data-button-ok="Delete" ' +
+                            'data-method="DELETE" ' +
+                            'href="' +remove_url +'">Delete</a> ';
                     }
-
-
-
-
                 }
-
             ],
+        });
+        table.element.addEventListener("click", function(e) {
+            const link = e.target.closest("a[data-confirm]");
+            if (!link || !link.href)
+                return;
+            e.preventDefault();
+            const options = {
+                text: link.dataset.confirm || 'Confirm?',
+                icon: link.dataset.type || 'warning' ,
+                showCancelButton: true,
+                confirmButtonText: link.dataset.buttonOk || 'OK',
+                cancelButtonText: link.dataset.buttonCancel || 'Cancel',
+            };
+            if (link.dataset.title){
+                options.title = link.dataset.title;
+            }
+            const url = link.href;
+            const method = link.dataset.method && ['GET', 'POST', 'PUT', 'DELETE'].includes(link.dataset.method.toUpperCase())
+                ? link.dataset.method.toUpperCase()
+                : 'GET';
+            Swal.fire(options).then((result) => {
+                if (!result.isConfirmed)
+                    return;
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        Accept: 'application/json'
+                    }
+                }).then((res) => {
+                    if (!res.ok)
+                        throw new Error('Error: ' + res.status);
+                    table.setData();
+                }).catch((err) => {
+                    Swal.fire({
+                        text: err.message,
+                        icon: "error"
+                    });
+                });
+            });
+        });
+        document.querySelectorAll("button[data-action]").forEach(button => {
+            button.addEventListener("click", function(e) {
+                e.preventDefault();
+                const action = button.dataset.action;
+                if (!selected_ids.size || !['delete', 'resume'].includes(action)){
+                    return;
+                }
+                const options = {
+                    title: "Attention",
+                    text: "Do you really want to " + action + " " + selected_ids.size + " news?",
+                    icon: "warning" ,
+                    showCancelButton: true,
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
+                };
+                const url = action == "delete"
+                    ? "{{ url_for('admin.admin_news.bulk_remove')}}"
+                    : "{{ url_for('admin.admin_news.bulk_resume')}}";
+                const method  = action == "delete"
+                    ? "DELETE"
+                    : "PUT";
+                Swal.fire(options).then((result) => {
+                    if (!result.isConfirmed)
+                        return;
+                    fetch(url, {
+                        method: method,
+                        headers: {
+                            Accept: 'application/json'
+                        },
+                        body: JSON.stringify({ids: Array.from(selected_ids)})
+                    }).then((res) => {
+                        if (!res.ok)
+                            throw new Error('Error: ' + res.status);
+                        selected_ids.clear();
+                        table.setData();
+                        update_action_buttons();
+                    }).catch((err) => {
+                        Swal.fire({
+                            text: err.message,
+                            icon: "error"
+                        });
+                    });
+                });
+            });
         });
     });
 </script>

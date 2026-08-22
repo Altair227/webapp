@@ -10,16 +10,16 @@ migrate-create:
 	@read -p "Enter migration name: " name; \
 	if [ -n "$$name" ]; then \
 		echo "Create migration '$$name'"; \
-		alembic revision --autogenerate -m "$$name"; \
+		uv run alembic revision --autogenerate -m "$$name"; \
 	else \
 		echo "Name cannot be empty"; \
 	fi
 
 migrate-up:
-	@alembic upgrade head
+	@uv run alembic upgrade head
 
 migrate-down:
-	@alembic downgrade -1
+	@uv run alembic downgrade -1
 
 run:
 	HOST=0.0.0.0 PORT=9000 python run.py

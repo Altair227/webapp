@@ -1,9 +1,9 @@
 from app.models import News
 from app.database import db_session
-from sqlalchemy import or_, desc
+from sqlalchemy import or_, desc, true
 from app.models.base import get_sortable_columns, to_dict
 from datetime import datetime
-
+from typing import List
 
 SORTABLE = get_sortable_columns(News)
 
@@ -78,6 +78,24 @@ class NewsService:
         data.description=description
         data.content=content
         data.published_at=published_at
+        try:
+            db_session.commit()
+            return None
+        except Exception as e:
+            return str(e)
+
+    @staticmethod
+    def remove(_id: List[int]) -> None | str:
+        db_session.query(News).filter(News.id.in_(_id)).update({"is_deleted": True}, synchronize_session=False)
+        try:
+            db_session.commit()
+            return None
+        except Exception as e:
+            return str(e)
+
+    @staticmethod
+    def resume(_id: List[int]) -> None | str:
+        db_session.query(News).filter(News.id.in_(_id)).update({"is_deleted": False}, synchronize_session=False)
         try:
             db_session.commit()
             return None

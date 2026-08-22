@@ -69,7 +69,7 @@ module = "alembic.*"
 ignore_errors = true
 
 [tool.alembic]
-script_location = "migrations"
+script_location = "%(here)s/migrations"
 prepend_sys_path = "."
 version_path_separator = "os"
 file_template = "%%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d%%(second).2d_%%(slug)s"
