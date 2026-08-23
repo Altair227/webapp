@@ -7,10 +7,9 @@ from flask import (
     url_for,
     flash,
     abort,
+    g,
 )
-from mypyc.primitives.set_ops import new_set_op
-
-from app.modules.admin.decorators import auth_required
+from app.modules.admin.decorators import auth_required, breadcrumbs
 from .services import NewsService
 from .forms import NewsForm
 
@@ -20,6 +19,10 @@ bp = Blueprint(
     url_prefix="/news",
     template_folder="templates",
 )
+
+@bp.before_request
+def crumbs():
+    g.breadcrumbs.append(('News', url_for('admin.admin_news.index')))
 
 
 @bp.get("/")
@@ -53,6 +56,7 @@ def search():
 
 @bp.route("/create", methods=["GET", "POST"])
 @auth_required(True, "admin.admin_auth.login")
+@breadcrumbs('Create news')
 def create():
     form = NewsForm()
     if form.validate_on_submit():
@@ -70,6 +74,7 @@ def create():
 
 @bp.route("/update/<_id>", methods=["GET", "POST"])
 @auth_required(True, "admin.admin_auth.login")
+@breadcrumbs('Update news')
 def update(_id):
     data = NewsService.get_by_id(int(_id))
     if not data:

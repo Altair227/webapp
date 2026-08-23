@@ -1,6 +1,4 @@
-from flask import Blueprint, session, g
-from sqlalchemy.sql.functions import current_user
-
+from flask import Blueprint, session, g, url_for
 from app.utils.modules import register_child_blueprints
 import app.modules.admin.modules as admin_modules
 from app.models import Admin
@@ -36,3 +34,8 @@ def load_user():
 @bp.context_processor
 def inject_user():
     return dict(current_user=g.user)
+
+
+@bp.before_request
+def base_breadcrumbs():
+    g.breadcrumbs = [('Admin', url_for('admin.admin_dashboard.index'))]
