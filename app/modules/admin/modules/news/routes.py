@@ -96,6 +96,18 @@ def update(_id):
     return render_template("admin_news/update.html", form=form, is_create=False)
 
 
+@bp.route("/view/<_id>", methods=["GET"])
+@auth_required(True, "admin.admin_auth.login")
+@breadcrumbs('View news')
+def view(_id):
+    data = NewsService.get_by_id(int(_id))
+    if not data:
+        abort(404, description='News not found')
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return render_template("admin_news/content.html", data=data)
+    return render_template("admin_news/view.html", data=data)
+
+
 @bp.route("/remove/<_id>", methods=["DELETE"])
 @auth_required(True, "admin.admin_auth.login")
 def remove(_id):

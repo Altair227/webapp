@@ -1,0 +1,21 @@
+<h2>{{data.title}}</h2>
+<div>
+    <span class="text-secondary">Created at:</span>&nbsp;
+    <span class="text-primary">{{data.created_at.strftime("%d.%m.%Y %H:%M")}}</span>
+</div>
+<div>
+    <span class="text-secondary">Updated at:</span>&nbsp;
+    <span class="text-primary">{{data.updated_at.strftime("%d.%m.%Y %H:%M")}}</span>
+</div>
+{% if data.published_at %}
+<div>
+    <span class="text-secondary">Published at:</span>&nbsp;
+    <span class="text-primary">{{data.published_at.strftime("%d.%m.%Y %H:%M")}}</span>
+</div>
+{% endif %}
+<hr>
+<h3>Description</h3>
+<p>{{data.description}}</p>
+<hr>
+<h3>Page content</h3>
+{{data.content | safe}}

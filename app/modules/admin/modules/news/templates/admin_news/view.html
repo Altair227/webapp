@@ -1,0 +1,9 @@
+{% extends "admin/layout.html" %}
+{%- block title -%}{{data.title}}{%- endblock -%}
+{% block content %}
+{% include "admin_news/content.html"%}
+<hr>
+<div class="text-end">
+    <a href="{{ url_for('admin.admin_news.update', _id=data.id)}}" class="btn btn-warning">Edit news</a>
+</div>
+{% endblock %}
