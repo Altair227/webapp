@@ -11,45 +11,41 @@
     <button class="btn btn-warning" data-action="resume">Resume</button>
 </div>
 <script>
-    function blabla() {}
+    let __table;
     const selected_ids = new Set();
     const url_edit_template = "{{ url_for('admin.admin_news.update', _id='__ID__')}}";
     const url_remove_template = "{{ url_for('admin.admin_news.remove', _id='__ID__')}}";
     const url_resume_template = "{{ url_for('admin.admin_news.resume', _id='__ID__')}}";
     const url_view_template = "{{ url_for('admin.admin_news.view', _id='__ID__')}}";
-    const format_date = (cell) => {
-        let value = cell.getValue();
-        if (!value) return "";
-
-        let date = new Date(value);
-
-        if (isNaN(date.getTime())) return "";
-
-        let year = date.getFullYear();
-        let month = String(date.getMonth() + 1).padStart(2, '0');
-        let day = String(date.getDate()).padStart(2, '0');
-        let hours = String(date.getHours()).padStart(2, '0');
-        let minutes = String(date.getMinutes()).padStart(2, '0');
-        let seconds = String(date.getSeconds()).padStart(2, '0');
-
-        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    let select_all;
+    const update_select_all = (instance) => {
+        if (!select_all){
+            return;
+        }
+        const total = instance.getData().length;
+        const selected = selected_ids.size;
+        select_all.checked = total > 0 && selected === total;
+        select_all.indeterminate = selected > 0 && selected < total;
     };
+    const update_action_buttons = () => {
+        document.getElementById("control").classList.toggle("d-none", !selected_ids.size);
+    };
+    function refresh_action_table(){
+        selected_ids.clear();
+        if (__table) {
+            __table.setData();
+            update_action_buttons();
+            update_select_all(__table);
+        }
+    }
+    function refresh_confirm_table() {
+        if (__table) {
+            __table.setData();
+        }
+    }
     document.addEventListener('DOMContentLoaded', event => {
-        let select_all;
-        const update_select_all = (instance) => {
-            if (!select_all){
-                return;
-            }
-            const total = instance.getData().length;
-            const selected = selected_ids.size;
-            select_all.checked = total > 0 && selected === total;
-            select_all.indeterminate = selected > 0 && selected < total;
-        };
-        const update_action_buttons = () => {
-            document.getElementById("control").classList.toggle("d-none", !selected_ids.size);
-        };
 
-        const table = new Tabulator("#news-content-table", {
+        __table = new Tabulator("#news-content-table", {
             ajaxURL: "{{ url_for('admin.admin_news.search') }}",
             pagination: true,
             paginationMode: "remote",
@@ -86,17 +82,16 @@
                         select_all.checked = !!selected_ids.size;
                         select_all.addEventListener("click", () => {
                             if (select_all.checked) {
-                                table.getData().forEach(row => selected_ids.add(row.id));
+                                __table.getData().forEach(row => selected_ids.add(row.id));
                             } else {
                                 selected_ids.clear();
                             }
-                            table.redraw(true);
+                            __table.redraw(true);
                             update_action_buttons();
                         });
                         return select_all;
                     },
                 },
-
                 { title: "ID", field: "id", width: 80 },
                 {
                     title: "Title",
@@ -115,20 +110,19 @@
                     title: "Published",
                     field: "published_at",
                     sorter: "datetime",
-                    formatter: format_date
-
+                    formatter: (cell)=>format_date(cell.getValue()),
                 },
                 {
                     title: "Created",
                     field: "created_at",
                     sorter: "datetime",
-                    formatter: format_date
+                    formatter: (cell)=>format_date(cell.getValue()),
                 },
                 {
                     title: "Updated",
                     field: "updated_at",
                     sorter: "datetime",
-                    formatter: format_date
+                    formatter: (cell)=>format_date(cell.getValue()),
                 },
                 {
                     title: "Deleted",
@@ -157,6 +151,7 @@
                                 'data-title="Recovery news" ' +
                                 'data-button-ok="Recovery" ' +
                                 'data-method="PUT" ' +
+                                'data-callback="refresh_confirm_table" ' +
                                 'href="' + resume_url + '">Resume</a>';
                         }
                         const edit_url = url_edit_template.replace('__ID__', id);
@@ -167,60 +162,14 @@
                             'data-title="Deleting news" ' +
                             'data-button-ok="Delete" ' +
                             'data-method="DELETE" ' +
+                            'data-callback="refresh_confirm_table" ' +
                             'href="' +remove_url +'">Delete</a> ';
                     }
                 }
             ],
         });
-        function refresh_action_table(){
-            selected_ids.clear();
-            table.setData();
-            update_action_buttons();
-            update_select_all(table);
-        }
-        function refresh_confirm_table(){
-            table.setData();
-        }
-        table.element.addEventListener("click", function(e) {
-            const link = e.target.closest("a[data-confirm]");
-            if (!link || !link.href)
-                return true;
-            e.preventDefault();
-            const options = {
-                text: link.dataset.confirm || 'Confirm?',
-                icon: link.dataset.type || 'warning' ,
-                showCancelButton: true,
-                confirmButtonText: link.dataset.buttonOk || 'OK',
-                cancelButtonText: link.dataset.buttonCancel || 'Cancel',
-            };
-            if (link.dataset.title){
-                options.title = link.dataset.title;
-            }
-            const url = link.href;
-            const method = link.dataset.method && ['GET', 'POST', 'PUT', 'DELETE'].includes(link.dataset.method.toUpperCase())
-                ? link.dataset.method.toUpperCase()
-                : 'GET';
-            Swal.fire(options).then((result) => {
-                if (!result.isConfirmed)
-                    return;
-                fetch(url, {
-                    method: method,
-                    headers: {
-                        Accept: 'application/json'
-                    }
-                }).then((res) => {
-                    if (!res.ok)
-                        throw new Error('Error: ' + res.status);
-                    refresh_confirm_table();
-                }).catch((err) => {
-                    Swal.fire({
-                        text: err.message,
-                        icon: "error"
-                    });
-                });
-            });
-        });
-        table.on("renderComplete", function(){
+
+        __table.on("renderComplete", function(){
             refresh_view(document.getElementById("news-content-table"));
         });
         document.querySelectorAll("button[data-action]").forEach(button => {

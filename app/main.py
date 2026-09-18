@@ -41,9 +41,6 @@ def create_app() -> Flask:
     app.config["SECRET_KEY"] = config.secret_key
     app.teardown_appcontext(shutdown_session)
 
-    @app.route("/")
-    def index():
-        return render_template("index.html", title="Main page")
 
     @app.errorhandler(404)
     def error_404(error):

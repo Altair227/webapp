@@ -1,5 +1,20 @@
-const open_modal = (link) => {
+const format_date = (value) => {
+    if (!value) return "";
+    let date = new Date(value);
+    if (isNaN(date.getTime())){
+        return "";
+    }
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+    let hours = String(date.getHours()).padStart(2, '0');
+    let minutes = String(date.getMinutes()).padStart(2, '0');
+    let seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
 
+
+const open_modal = (link) => {
     if (link.dataset.modalBound){
         return;
     }
@@ -38,8 +53,60 @@ const open_modal = (link) => {
         }
     });
 };
+
+const open_confirm = (link)=>{
+
+    const options = {
+        text: link.dataset.confirm || 'Confirm?',
+        icon: link.dataset.type || 'warning' ,
+        showCancelButton: true,
+        confirmButtonText: link.dataset.buttonOk || 'OK',
+        cancelButtonText: link.dataset.buttonCancel || 'Cancel',
+    };
+    if (link.dataset.title){
+        options.title = link.dataset.title;
+    }
+    const url = link.href;
+    const method = link.dataset.method && ['GET', 'POST', 'PUT', 'DELETE'].includes(link.dataset.method.toUpperCase())
+        ? link.dataset.method.toUpperCase()
+        : 'GET';
+    Swal.fire(options).then((result) => {
+        if (!result.isConfirmed)
+            return;
+        fetch(url, {
+            method: method,
+            headers: {
+                Accept: 'application/json'
+            }
+        }).then((res) => {
+            if (!res.ok)
+                throw new Error('Error: ' + res.status);
+            const callback = link.dataset.callback;
+            console.log(callback);
+            if (callback && callback in window && typeof window[callback] == "function"){
+                window[callback]();
+            }
+        }).catch((err) => {
+            Swal.fire({
+                text: err.message,
+                icon: "error"
+            });
+        });
+    });
+};
+
+
 const refresh_view = (_dom) => {
     _dom.querySelectorAll('a[data-modal]').forEach(open_modal);
+    _dom.querySelectorAll('a[data-confirm]').forEach(link=>{
+        link.addEventListener("click", e=>{
+            if (!link || !link.href){
+                return true;
+            }
+            e.preventDefault();
+            open_confirm(link);
+        });
+    });
     const datepickers = _dom.querySelectorAll('input[data-field-type="date"]');
     if (datepickers.length){
         for(let dt of datepickers){
