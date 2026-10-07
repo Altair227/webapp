@@ -40,6 +40,19 @@ services:
       - "8025:8025"
       - "1025:1025"
 
+  jodit-finder:
+    image: w2fb/jodit-python:latest
+    container_name: jodit-finder
+    restart: unless-stopped
+    ports:
+      - "9023:9023"
+    user: "1000:1000"
+    environment:
+      PORT: "9023"
+      CONFIG_FILE: /app/config.json
+    volumes:
+      - ./jodit-finder.json:/app/config.json:ro
+      - ../web/upload:/app/files
 networks:
   crm-network:
     driver: bridge

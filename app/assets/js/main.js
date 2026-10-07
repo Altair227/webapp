@@ -1,3 +1,4 @@
+let FB;
 const format_date = (value) => {
     if (!value) return "";
     let date = new Date(value);
@@ -98,9 +99,9 @@ const open_confirm = (link)=>{
 
 const refresh_view = (_dom) => {
     _dom.querySelectorAll('a[data-modal]').forEach(open_modal);
-    _dom.querySelectorAll('a[data-confirm]').forEach(link=>{
-        link.addEventListener("click", e=>{
-            if (!link || !link.href){
+    _dom.querySelectorAll('a[data-confirm]').forEach(link => {
+        link.addEventListener("click", e => {
+            if (!link || !link.href) {
                 return true;
             }
             e.preventDefault();
@@ -108,8 +109,8 @@ const refresh_view = (_dom) => {
         });
     });
     const datepickers = _dom.querySelectorAll('input[data-field-type="date"]');
-    if (datepickers.length){
-        for(let dt of datepickers){
+    if (datepickers.length) {
+        for (let dt of datepickers) {
             new AirDatepicker(dt, {
                 dateFormat: 'yyyy-MM-dd'
             });
@@ -117,24 +118,56 @@ const refresh_view = (_dom) => {
     }
     const wysiwyg = _dom.querySelectorAll('textarea[data-field-type="wysiwyg"]');
 
-    if (wysiwyg.length){
-        for(let wg of wysiwyg){
-            const container = _dom.createElement('div');
-            wg.parentNode.insertBefore(container, wg);
-            wg.style.display = 'none';
-
-            const quill = new Quill(container, {
-                theme: 'snow',
-                placeholder: wg.placeholder || ''
+    if (wysiwyg.length) {
+        for (let wg of wysiwyg) {
+            const editor = Jodit.make(wg, {
+                height: 400,
+                filebrowser: {
+                    ajax: {
+                        url: 'http://127.0.0.1:9023/'
+                    }
+                },
+                uploader: {
+                    url: 'http://127.0.0.1:9023/?action=fileUpload'
+                }
             });
-            quill.root.style.minHeight = "200px";
-            if (wg.value) {
-                quill.root.innerHTML = wg.value;
+
+        }
+    }
+
+    const filemanagers = _dom.querySelectorAll('button[data-button-type="filemanager"]');
+    if (filemanagers.length) {
+        if (!FB){
+            FB = new Jodit.modules.FileBrowser({
+                ajax: {
+                    url: 'http://127.0.0.1:9023/'
+                },
+                uploader: {
+                    url: 'http://127.0.0.1:9023/?action=fileUpload'
+                }
+            });
+        }
+        for (let fm of filemanagers) {
+
+            if (fm.dataset.fmBound){
+                return;
             }
-            quill.on('text-change', () => {
-                wg.value = quill.root.innerHTML;
+            const type = fm.dataset.selectType || "file";
+            const field = fm.dataset.selectField ? _dom.querySelector("#" + fm.dataset.selectField ) : null;
+            fm.addEventListener("click", e=>{
+                e.preventDefault();
+                FB.open(data=>{
+                    if (field){
+                        let value = data.files[0];
+                        if (!value.startsWith('http')){
+                            value = data.baseurl + value;
+                        }
+                        field.value = value;
+                        field.dispatchEvent(new Event('change',{bubbles: true}));
+                    }
+                }, type == "image");
             });
-
+            fm.dataset.fmBound = true;
         }
     }
 };

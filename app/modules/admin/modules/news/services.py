@@ -45,12 +45,14 @@ class NewsService:
         description: str,
         content: str,
         published_at: datetime | None = None,
+        image_url: str | None = None,
     ) -> str | None:
         data = News(
             title=title,
             description=description,
             content=content,
             published_at=published_at,
+            image_url=image_url,
         )
         db_session.add(data)
         try:
@@ -70,6 +72,7 @@ class NewsService:
         description: str,
         content: str,
         published_at: datetime | None = None,
+        image_url: str | None = None,
     ) -> str | None:
         data = NewsService.get_by_id(_id)
         if not data:
@@ -78,6 +81,7 @@ class NewsService:
         data.description=description
         data.content=content
         data.published_at=published_at
+        data.image_url=image_url
         try:
             db_session.commit()
             return None

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, abort
 from .services import NewsService
 
 bp = Blueprint(
@@ -22,4 +22,7 @@ def index():
 
 @bp.route("/news-<_id>.html", methods=["GET"])
 def view(_id):
-    pass
+    data = NewsService.get_by_id(int(_id))
+    if not data:
+        abort(404, description="News not found")
+    return render_template("client_news/view.html", item=data)

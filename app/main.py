@@ -1,12 +1,15 @@
 import logging
 from app.database import shutdown_session
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from app.config import get_config
 from app.utils.logger import init_logger
 from app.utils.modules import register_child_blueprints
 import app.modules as app_pkg
 from app.utils.mailer import get_mailer
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent.parent  #.../app
+UPLOAD_DIR = BASE_DIR / "web" / "upload"
 
 def create_app() -> Flask:
     config = get_config()
@@ -40,7 +43,11 @@ def create_app() -> Flask:
 
     app.config["SECRET_KEY"] = config.secret_key
     app.teardown_appcontext(shutdown_session)
+    app.config["UPLOAD_DIR"] = str(UPLOAD_DIR)
 
+    @app.route("/upload/<path:filename>")
+    def uploaded_file(filename):
+        return send_from_directory(app.config["UPLOAD_DIR"], filename)
 
     @app.errorhandler(404)
     def error_404(error):

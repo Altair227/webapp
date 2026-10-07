@@ -1,0 +1,33 @@
+{% extends "client/base.html" %}
+
+{% block title %}{{ item.title }}{% endblock %}
+
+{% block content %}
+
+<article class="news">
+
+    <h1>{{ item.title }}</h1>
+
+    <p class="text-muted">
+        {% if item.published_at %}
+            Опубликовано: {{ item.published_at.strftime("%d %B, %Y %H:%M") }}
+        {% else %}
+            Создано: {{ item.created_at.strftime("%d %B, %Y %H:%M") }}
+        {% endif %}
+    </p>
+
+    {% if item.image_url %}
+        <img
+            src="{{ item.image_url }}"
+            class="img-fluid mb-4"
+            alt="{{ item.title }}"
+        >
+    {% endif %}
+
+    <div class="news-content">
+        {{ item.content | safe }}
+    </div>
+
+</article>
+
+{% endblock %}
