@@ -1,8 +1,8 @@
-"""created news tables
+"""create_news_table
 
-Revision ID: 8d265a0a596d
-Revises: eb430226ae0a
-Create Date: 2026-06-01 22:00:40.734059
+Revision ID: 65f14f6f2728
+Revises: d1f8e4955dec
+Create Date: 2026-10-22 02:14:52.733793
 
 """
 
@@ -10,11 +10,11 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+
 
 # revision identifiers, used by Alembic.
-revision: str = "8d265a0a596d"
-down_revision: Union[str, Sequence[str], None] = "eb430226ae0a"
+revision: str = "65f14f6f2728"
+down_revision: Union[str, Sequence[str], None] = "d1f8e4955dec"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -29,13 +29,12 @@ def upgrade() -> None:
         sa.Column("content", sa.Text(), nullable=False),
         sa.Column(
             "published_at",
-            sa.DateTime(),
+            sa.DateTime(timezone=True),
             server_default=sa.text("now()"),
             nullable=False,
         ),
-        sa.Column("image_url", sa.String(length=255), nullable=False),
+        sa.Column("image_url", sa.String(length=255), nullable=True),
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("is_deleted", sa.Boolean(), nullable=False),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -48,8 +47,10 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
             nullable=False,
         ),
+        sa.Column("is_deleted", sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
+    # ### end Alembic commands ###
 
 
 def downgrade() -> None:

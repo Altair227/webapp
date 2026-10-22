@@ -20,9 +20,10 @@ bp = Blueprint(
     template_folder="templates",
 )
 
+
 @bp.before_request
 def crumbs():
-    g.breadcrumbs.append(('News', url_for('admin.admin_news.index')))
+    g.breadcrumbs.append(("News", url_for("admin.admin_news.index")))
 
 
 @bp.get("/")
@@ -56,7 +57,7 @@ def search():
 
 @bp.route("/create", methods=["GET", "POST"])
 @auth_required(True, "admin.admin_auth.login")
-@breadcrumbs('Create news')
+@breadcrumbs("Create news")
 def create():
     form = NewsForm()
     if form.validate_on_submit():
@@ -75,14 +76,12 @@ def create():
 
 @bp.route("/update/<_id>", methods=["GET", "POST"])
 @auth_required(True, "admin.admin_auth.login")
-@breadcrumbs('Update news')
+@breadcrumbs("Update news")
 def update(_id):
     data = NewsService.get_by_id(int(_id))
     if not data:
-        abort(404, description='News not found')
-    form = NewsForm(
-        obj=data
-    )
+        abort(404, description="News not found")
+    form = NewsForm(obj=data)
     if form.validate_on_submit():
         error = NewsService.update(
             _id=data.id,
@@ -95,16 +94,18 @@ def update(_id):
         if not error:
             return redirect(url_for("admin.admin_news.index"))
         flash(error, "error")
-    return render_template("admin_news/update.html", form=form, is_create=False)
+    return render_template(
+        "admin_news/update.html", form=form, is_create=False
+    )
 
 
 @bp.route("/view/<_id>", methods=["GET"])
 @auth_required(True, "admin.admin_auth.login")
-@breadcrumbs('View news')
+@breadcrumbs("View news")
 def view(_id):
     data = NewsService.get_by_id(int(_id))
     if not data:
-        abort(404, description='News not found')
+        abort(404, description="News not found")
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return render_template("admin_news/content.html", data=data)
     return render_template("admin_news/view.html", data=data)
@@ -113,36 +114,36 @@ def view(_id):
 @bp.route("/remove/<_id>", methods=["DELETE"])
 @auth_required(True, "admin.admin_auth.login")
 def remove(_id):
-    message=NewsService.remove([_id])
+    message = NewsService.remove([_id])
     if message:
         abort(404, description=message)
-    return '', 200
+    return "", 200
 
 
 @bp.route("/bulk-remove", methods=["DELETE"])
 @auth_required(True, "admin.admin_auth.login")
 def bulk_remove():
-    ids = request.get_json(force=True).get("ids",[])
-    message=NewsService.remove(ids)
+    ids = request.get_json(force=True).get("ids", [])
+    message = NewsService.remove(ids)
     if message:
         abort(404, description=message)
-    return '', 200
+    return "", 200
 
 
 @bp.route("/resume/<_id>", methods=["PUT"])
 @auth_required(True, "admin.admin_auth.login")
 def resume(_id):
-    message=NewsService.resume([_id])
+    message = NewsService.resume([_id])
     if message:
         abort(404, description=message)
-    return '', 200
+    return "", 200
 
 
 @bp.route("/bulk-resume", methods=["PUT"])
 @auth_required(True, "admin.admin_auth.login")
 def bulk_resume():
     ids = request.get_json(force=True).get("ids", [])
-    message=NewsService.resume(ids)
+    message = NewsService.resume(ids)
     if message:
         abort(404, description=message)
-    return '', 200
+    return "", 200

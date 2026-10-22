@@ -8,8 +8,9 @@ import app.modules as app_pkg
 from app.utils.mailer import get_mailer
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent  #.../app
+BASE_DIR = Path(__file__).resolve().parent.parent  # .../app
 UPLOAD_DIR = BASE_DIR / "web" / "upload"
+
 
 def create_app() -> Flask:
     config = get_config()

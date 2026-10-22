@@ -1,19 +1,47 @@
-version: '3.8'
+name: altair
 
 services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/python.Dockerfile
+    working_dir: /srv
+    volumes:
+      - ..:/srv
+      - ./runtime/logs/webapp:/var/log/webapp
+    env_file:
+      - ../app/.env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 9000
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+    ports:
+      - "9000:9000"
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    networks:
+      - crm-network
+
   postgres:
     image: postgres:15
     env_file:
       - ../app/.env
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "psql -U $$POSTGRES_USER -d $$POSTGRES_DB -tAc 'select 1'"]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - ./runtime/postgres:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - crm-network
     deploy:
@@ -25,24 +53,40 @@ services:
 
   prettier:
     image: node:20-alpine
+    profiles: ["tools"]
     working_dir: /app
     volumes:
       - ../app:/app
-    command: sh -c "npm install -g prettier && prettier --write '**/*.html **/*.css'"
-    user: "${UID}:${GID}"
+      - ./runtime/cache/npm:/tmp/.npm
+    environment:
+      npm_config_cache: /tmp/.npm
+    entrypoint: ["npx", "--yes", "prettier@3"]
+    command: ["--write", "**/*.html", "**/*.css"]
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+
+  node:
+    image: node:20-alpine
+    profiles: ["tools"]
+    working_dir: /app/assets
+    volumes:
+      - ../app/assets:/app/assets
+      - ./runtime/cache/npm:/tmp/.npm
+    environment:
+      npm_config_cache: /tmp/.npm
+    entrypoint: ["npm"]
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
 
   mailpit:
-    container_name: lms-mailpit
     image: axllent/mailpit
     networks:
       - crm-network
     ports:
-      - "8025:8025"
+      - "8026:8025"
       - "1025:1025"
 
   jodit-finder:
-    image: w2fb/jodit-python:latest
-    container_name: jodit-finder
+    # >= 0.6.0: needed for the root-relative baseurl in jodit-finder.json
+    image: w2fb/jodit-python:0.6.0
     restart: unless-stopped
     ports:
       - "9023:9023"

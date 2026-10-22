@@ -5,11 +5,6 @@ from sqlalchemy.engine import Dialect
 from sqlalchemy.types import TypeDecorator
 
 
-class UserType(IntEnum):
-    USER = 0
-    ADMIN = 1
-
-
 class AdminType(IntEnum):
     SUPER_ADMIN = 0
     ADMIN = 1

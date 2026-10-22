@@ -2,7 +2,13 @@ from datetime import datetime, UTC
 from typing import Any
 from sqlalchemy import Boolean, DateTime, event, func, Integer, inspect
 from sqlalchemy.engine import Connection
-from sqlalchemy.orm import DeclarativeBase, Mapped, Mapper, mapped_column
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    Mapper,
+    mapped_column,
+    declared_attr,
+)
 
 
 def get_sortable_columns(model):
@@ -27,25 +33,41 @@ class Base(DeclarativeBase):
         autoincrement=True,
         comment="",
     )
-    is_deleted: Mapped[bool] = mapped_column(
-        Boolean, default=False, nullable=False, comment=""
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-        comment="",
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-        onupdate=func.now(),
-        comment="",
-    )
 
 
-@event.listens_for(Base, "before_update", propagate=True)
+class TimestampMixin:
+    @declared_attr
+    def created_at(cls) -> Mapped[datetime]:
+        return mapped_column(
+            DateTime(timezone=True),
+            server_default=func.now(),
+            nullable=False,
+            comment="",
+        )
+
+    @declared_attr
+    def updated_at(cls) -> Mapped[datetime]:
+        return mapped_column(
+            DateTime(timezone=True),
+            server_default=func.now(),
+            onupdate=func.now(),
+            nullable=False,
+            comment="",
+        )
+
+
+class SafeDeleteMixin:
+    @declared_attr
+    def is_deleted(cls) -> Mapped[bool]:
+        return mapped_column(
+            Boolean,
+            default=False,
+            nullable=False,
+            comment="",
+        )
+
+
+@event.listens_for(TimestampMixin, "before_update", propagate=True)
 def before_update(
     _mapper: Mapper[Any], _connection: Connection, target: Base
 ) -> None:

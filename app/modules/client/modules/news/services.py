@@ -4,8 +4,6 @@ from sqlalchemy import or_, func
 from app.models.base import to_dict
 
 
-
-
 class NewsService:
     @staticmethod
     def list(
@@ -22,22 +20,21 @@ class NewsService:
             or_(
                 News.published_at.is_(None),
                 News.published_at <= func.now(),
-            )
+            ),
         )
         if search:
             like = f"%{search}%"
             query = query.filter(
                 or_(News.title.ilike(like), News.description.ilike(like))
             )
-            query=query.order_by(
+            query = query.order_by(
                 func.greatest(
                     func.coalesce(News.published_at, News.created_at),
-                    News.created_at
+                    News.created_at,
                 ).desc()
             )
         rows = query.offset((page - 1) * size).limit(size).all()
         return [to_dict(news) for news in rows]
-
 
     @staticmethod
     def get_by_id(_id: int) -> News | None:
@@ -47,8 +44,6 @@ class NewsService:
             or_(
                 News.published_at.is_(None),
                 News.published_at <= func.now(),
-            )
+            ),
         )
         return query.first()
-
-

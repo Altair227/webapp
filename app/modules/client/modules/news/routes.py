@@ -20,6 +20,7 @@ def index():
     )
     return render_template("client_news/index.html", items=data)
 
+
 @bp.route("/news-<_id>.html", methods=["GET"])
 def view(_id):
     data = NewsService.get_by_id(int(_id))

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
-from .base import Base
+from .base import Base, TimestampMixin, SafeDeleteMixin
 from datetime import date
-from sqlalchemy import Integer, String, ForeignKey, Date
+from sqlalchemy import String, ForeignKey, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from .user import User
 
 
-class UserData(Base):
+class UserData(Base, TimestampMixin, SafeDeleteMixin):
     __tablename__ = "user_data"
 
     user_id: Mapped[int] = mapped_column(

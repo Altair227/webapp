@@ -33,6 +33,7 @@ dependencies = [
 
 [tool.ruff]
 line-length = 79
+cache-dir = "docker/runtime/cache/ruff"
 target-version = "py314"
 exclude = [
     ".git",
@@ -57,6 +58,7 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.mypy]
+cache_dir = "docker/runtime/cache/mypy"
 python_version = "3.14"
 strict = true
 warn_return_any = true
@@ -64,9 +66,17 @@ warn_unused_ignores = true
 show_error_codes = true
 exclude = [".venv", "alembic"]
 
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+
 [[tool.mypy.overrides]]
 module = "alembic.*"
 ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "sqlalchemy_utils.*"
+ignore_missing_imports = true
 
 [tool.alembic]
 script_location = "%(here)s/migrations"

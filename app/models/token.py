@@ -1,11 +1,11 @@
-from .base import Base
+from .base import Base, TimestampMixin
 from app.common.types import EntityType, SmallIntEnum, EmailTokenType
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, DateTime
 from datetime import datetime
 
 
-class EmailToken(Base):
+class EmailToken(Base, TimestampMixin):
     __tablename__ = "email_tokens"
     __table_args__ = (
         SmallIntEnum.create_check_constraint("entity_type", EntityType),

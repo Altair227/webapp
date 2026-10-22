@@ -19,14 +19,15 @@ def auth_required(
 
     return decorator
 
-def breadcrumbs(
-    label:str, endpoint:str = None,**url_kwargs
-):
+
+def breadcrumbs(label: str, endpoint: str = None, **url_kwargs):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             url = url_for(endpoint, **url_kwargs) if endpoint else None
             g.breadcrumbs.append((label, url))
             return f(*args, **kwargs)
+
         return decorated_function
+
     return decorator

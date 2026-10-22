@@ -1,6 +1,6 @@
 import logging
 from logging.handlers import RotatingFileHandler
-from app.config import LoggerConfig
+from app.config import BASE_DIR, LoggerConfig
 from typing import ClassVar
 from pathlib import Path
 
@@ -47,6 +47,8 @@ class Logger:
         if not config or not config.dir:
             return logger
         logging_dir = Path(config.dir)
+        if not logging_dir.is_absolute():
+            logging_dir = BASE_DIR / logging_dir
         logging_dir.mkdir(parents=True, exist_ok=True)
         levels = {
             "access": logging.INFO,

@@ -76,12 +76,12 @@ class NewsService:
     ) -> str | None:
         data = NewsService.get_by_id(_id)
         if not data:
-            return 'News not found'
-        data.title=title
-        data.description=description
-        data.content=content
-        data.published_at=published_at
-        data.image_url=image_url
+            return "News not found"
+        data.title = title
+        data.description = description
+        data.content = content
+        data.published_at = published_at
+        data.image_url = image_url
         try:
             db_session.commit()
             return None
@@ -90,7 +90,9 @@ class NewsService:
 
     @staticmethod
     def remove(_id: List[int]) -> None | str:
-        db_session.query(News).filter(News.id.in_(_id)).update({"is_deleted": True}, synchronize_session=False)
+        db_session.query(News).filter(News.id.in_(_id)).update(
+            {"is_deleted": True}, synchronize_session=False
+        )
         try:
             db_session.commit()
             return None
@@ -99,7 +101,9 @@ class NewsService:
 
     @staticmethod
     def resume(_id: List[int]) -> None | str:
-        db_session.query(News).filter(News.id.in_(_id)).update({"is_deleted": False}, synchronize_session=False)
+        db_session.query(News).filter(News.id.in_(_id)).update(
+            {"is_deleted": False}, synchronize_session=False
+        )
         try:
             db_session.commit()
             return None

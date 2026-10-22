@@ -1,14 +1,14 @@
-from .base import Base
-
-# from typing import TYPE_CHECKING
+from .base import Base, TimestampMixin, SafeDeleteMixin
+from .relations import _r_news_source_image
+from typing import TYPE_CHECKING
 from sqlalchemy import String, Text, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-# if TYPE_CHECKING:
-#      from .admin_data import AdminData
+if TYPE_CHECKING:
+    from .source_image import SourceImage
 
 
-class News(Base):
+class News(Base, TimestampMixin, SafeDeleteMixin):
     __tablename__ = "news"
 
     title: Mapped[str] = mapped_column(
@@ -38,4 +38,10 @@ class News(Base):
         default=None,
         nullable=True,
         comment="",
+    )
+    images: Mapped[list["SourceImage"]] = relationship(
+        "SourceImage",
+        secondary=_r_news_source_image,
+        lazy="select",
+        passive_deletes=True,
     )

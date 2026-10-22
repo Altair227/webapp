@@ -1,12 +1,15 @@
 {
   "allowCrossOrigin": true,
-  "allowedOrigins": ["http://127.0.0.1:9000", "http://localhost:9000"],
+  "allowedOrigins": [
+    "http://localhost:9000",
+    "http://127.0.0.1:9000"
+  ],
   "maxUploadFileSize": "16mb",
   "sources": {
     "default": {
       "title": "Upload",
       "root": "/app/files",
-      "baseurl": "http://127.0.0.1:9000/upload/"
+      "baseurl": "/upload/"
     }
   }
 }

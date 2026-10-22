@@ -1,220 +1,246 @@
-{% extends "admin/layout.html" %}
-{%- block title -%}Admin News{%- endblock -%}
+{% extends "admin/layout.html" %} {%- block title -%}Admin News{%- endblock -%}
 {% block content %}
 <h2>Admin news page</h2>
-<a href="{{ url_for('admin.admin_news.create')}}" class="btn btn-success">Create news</a>
+<a href="{{ url_for('admin.admin_news.create')}}" class="btn btn-success">
+  Create news
+</a>
 <div id="news-content" class="mt-4">
-    <div id="news-content-table"></div>
+  <div id="news-content-table"></div>
 </div>
 <div id="control" class="d-none">
-    <button class="btn btn-danger" data-action="delete">Delete</button>
-    <button class="btn btn-warning" data-action="resume">Resume</button>
+  <button class="btn btn-danger" data-action="delete">Delete</button>
+  <button class="btn btn-warning" data-action="resume">Resume</button>
 </div>
 <script>
-    let __table;
-    const selected_ids = new Set();
-    const url_edit_template = "{{ url_for('admin.admin_news.update', _id='__ID__')}}";
-    const url_remove_template = "{{ url_for('admin.admin_news.remove', _id='__ID__')}}";
-    const url_resume_template = "{{ url_for('admin.admin_news.resume', _id='__ID__')}}";
-    const url_view_template = "{{ url_for('admin.admin_news.view', _id='__ID__')}}";
-    let select_all;
-    const update_select_all = (instance) => {
-        if (!select_all){
-            return;
-        }
-        const total = instance.getData().length;
-        const selected = selected_ids.size;
-        select_all.checked = total > 0 && selected === total;
-        select_all.indeterminate = selected > 0 && selected < total;
-    };
-    const update_action_buttons = () => {
-        document.getElementById("control").classList.toggle("d-none", !selected_ids.size);
-    };
-    function refresh_action_table(){
-        selected_ids.clear();
-        if (__table) {
-            __table.setData();
-            update_action_buttons();
-            update_select_all(__table);
-        }
+  let __table;
+  const selected_ids = new Set();
+  const url_edit_template =
+    "{{ url_for('admin.admin_news.update', _id='__ID__')}}";
+  const url_remove_template =
+    "{{ url_for('admin.admin_news.remove', _id='__ID__')}}";
+  const url_resume_template =
+    "{{ url_for('admin.admin_news.resume', _id='__ID__')}}";
+  const url_view_template =
+    "{{ url_for('admin.admin_news.view', _id='__ID__')}}";
+  let select_all;
+  const update_select_all = (instance) => {
+    if (!select_all) {
+      return;
     }
-    function refresh_confirm_table() {
-        if (__table) {
-            __table.setData();
-        }
+    const total = instance.getData().length;
+    const selected = selected_ids.size;
+    select_all.checked = total > 0 && selected === total;
+    select_all.indeterminate = selected > 0 && selected < total;
+  };
+  const update_action_buttons = () => {
+    document
+      .getElementById("control")
+      .classList.toggle("d-none", !selected_ids.size);
+  };
+  function refresh_action_table() {
+    selected_ids.clear();
+    if (__table) {
+      __table.setData();
+      update_action_buttons();
+      update_select_all(__table);
     }
-    document.addEventListener('DOMContentLoaded', event => {
+  }
+  function refresh_confirm_table() {
+    if (__table) {
+      __table.setData();
+    }
+  }
+  document.addEventListener("DOMContentLoaded", (event) => {
+    __table = new Tabulator("#news-content-table", {
+      ajaxURL: "{{ url_for('admin.admin_news.search') }}",
+      pagination: true,
+      paginationMode: "remote",
+      paginationSize: 25,
+      sortMode: "remote",
+      selectable: false,
+      layout: "fitColumns",
+      renderVertical: "basic",
+      columns: [
+        {
+          field: "select",
+          hozAlign: "center",
+          headerHozAlign: "center",
+          headerSort: false,
+          width: 80,
+          formatter: (cell) => {
+            const id = cell.getData().id;
+            const input = document.createElement("input");
+            input.type = "checkbox";
+            input.className = "form-check-input";
+            input.checked = selected_ids.has(id);
+            input.addEventListener("click", (e) => {
+              e.stopPropagation();
+              input.checked ? selected_ids.add(id) : selected_ids.delete(id);
+              update_action_buttons();
+              update_select_all(cell.getTable());
+            });
+            return input;
+          },
+          titleFormatter: () => {
+            select_all = document.createElement("input");
+            select_all.type = "checkbox";
+            select_all.className = "form-check-input";
+            select_all.checked = !!selected_ids.size;
+            select_all.addEventListener("click", () => {
+              if (select_all.checked) {
+                __table.getData().forEach((row) => selected_ids.add(row.id));
+              } else {
+                selected_ids.clear();
+              }
+              __table.redraw(true);
+              update_action_buttons();
+            });
+            return select_all;
+          },
+        },
+        { title: "ID", field: "id", width: 80 },
+        {
+          title: "Title",
+          field: "title",
+          formatter: function (cell) {
+            const id = cell.getData().id;
+            const title = cell.getData().title;
+            const view_url = url_view_template.replace("__ID__", id);
+            return (
+              "<a " +
+              'target="_blank" ' +
+              "data-modal " +
+              'href="' +
+              view_url +
+              '">' +
+              title +
+              "</a>"
+            );
+          },
+        },
+        {
+          title: "Published",
+          field: "published_at",
+          sorter: "datetime",
+          formatter: (cell) => format_date(cell.getValue()),
+        },
+        {
+          title: "Created",
+          field: "created_at",
+          sorter: "datetime",
+          formatter: (cell) => format_date(cell.getValue()),
+        },
+        {
+          title: "Updated",
+          field: "updated_at",
+          sorter: "datetime",
+          formatter: (cell) => format_date(cell.getValue()),
+        },
+        {
+          title: "Deleted",
+          field: "is_deleted",
+          sorter: "boolean",
+          cssClass: "text-center",
+          formatter: function (cell) {
+            const value = cell.getValue();
+            if (value) {
+              return '<b class="bi bi-check text-success fs-3"></b>';
+            } else {
+              return '<b class="bi bi-x text-danger fs-3"></b>';
+            }
+          },
+        },
+        {
+          title: "",
+          headerSort: false,
+          formatter: function (cell) {
+            const id = cell.getData().id;
+            const is_deleted = cell.getData().is_deleted;
+            if (is_deleted) {
+              const resume_url = url_resume_template.replace("__ID__", id);
+              return (
+                "<a " +
+                'data-confirm="Do you really want to resume these news?" ' +
+                'data-title="Recovery news" ' +
+                'data-button-ok="Recovery" ' +
+                'data-method="PUT" ' +
+                'data-callback="refresh_confirm_table" ' +
+                'href="' +
+                resume_url +
+                '">Resume</a>'
+              );
+            }
+            const edit_url = url_edit_template.replace("__ID__", id);
+            const remove_url = url_remove_template.replace("__ID__", id);
+            return (
+              '<a href="' +
+              edit_url +
+              '">Edit</a> | ' +
+              "<a " +
+              'data-confirm="Do you really want to remove these news?" ' +
+              'data-title="Deleting news" ' +
+              'data-button-ok="Delete" ' +
+              'data-method="DELETE" ' +
+              'data-callback="refresh_confirm_table" ' +
+              'href="' +
+              remove_url +
+              '">Delete</a> '
+            );
+          },
+        },
+      ],
+    });
 
-        __table = new Tabulator("#news-content-table", {
-            ajaxURL: "{{ url_for('admin.admin_news.search') }}",
-            pagination: true,
-            paginationMode: "remote",
-            paginationSize: 25,
-            sortMode: "remote",
-            selectable: false,
-            layout: "fitColumns",
-            renderVertical: "basic",
-            columns: [
-                {
-                    field: 'select',
-                    hozAlign: 'center',
-                    headerHozAlign: 'center',
-                    headerSort: false,
-                    width: 80,
-                    formatter: (cell) => {
-                        const id = cell.getData().id;
-                        const input = document.createElement("input");
-                        input.type = "checkbox";
-                        input.className = "form-check-input";
-                        input.checked = selected_ids.has(id);
-                        input.addEventListener("click", (e) => {
-                            e.stopPropagation();
-                            input.checked ? selected_ids.add(id) : selected_ids.delete(id);
-                            update_action_buttons();
-                            update_select_all(cell.getTable());
-                        });
-                        return input;
-                    },
-                    titleFormatter: () => {
-                        select_all = document.createElement("input");
-                        select_all.type = "checkbox";
-                        select_all.className = "form-check-input";
-                        select_all.checked = !!selected_ids.size;
-                        select_all.addEventListener("click", () => {
-                            if (select_all.checked) {
-                                __table.getData().forEach(row => selected_ids.add(row.id));
-                            } else {
-                                selected_ids.clear();
-                            }
-                            __table.redraw(true);
-                            update_action_buttons();
-                        });
-                        return select_all;
-                    },
-                },
-                { title: "ID", field: "id", width: 80 },
-                {
-                    title: "Title",
-                    field: "title",
-                    formatter: function(cell){
-                        const id = cell.getData().id;
-                        const title = cell.getData().title;
-                        const view_url = url_view_template.replace('__ID__', id);
-                        return  '<a ' +
-                            'target="_blank" ' +
-                            'data-modal ' +
-                            'href="' + view_url + '">' + title + '</a>';
-                    }
-                },
-                {
-                    title: "Published",
-                    field: "published_at",
-                    sorter: "datetime",
-                    formatter: (cell)=>format_date(cell.getValue()),
-                },
-                {
-                    title: "Created",
-                    field: "created_at",
-                    sorter: "datetime",
-                    formatter: (cell)=>format_date(cell.getValue()),
-                },
-                {
-                    title: "Updated",
-                    field: "updated_at",
-                    sorter: "datetime",
-                    formatter: (cell)=>format_date(cell.getValue()),
-                },
-                {
-                    title: "Deleted",
-                    field: "is_deleted",
-                    sorter: "boolean",
-                    cssClass: "text-center",
-                    formatter: function(cell){
-                        const value = cell.getValue();
-                        if (value){
-                            return '<b class="bi bi-check text-success fs-3"></b>';
-                        } else {
-                            return '<b class="bi bi-x text-danger fs-3"></b>';
-                        }
-                    }
-                },
-                {
-                    title: "",
-                    headerSort: false,
-                    formatter: function(cell){
-                        const id = cell.getData().id;
-                        const is_deleted = cell.getData().is_deleted;
-                        if (is_deleted){
-                            const resume_url = url_resume_template.replace('__ID__', id);
-                            return  '<a ' +
-                                'data-confirm="Do you really want to resume these news?" ' +
-                                'data-title="Recovery news" ' +
-                                'data-button-ok="Recovery" ' +
-                                'data-method="PUT" ' +
-                                'data-callback="refresh_confirm_table" ' +
-                                'href="' + resume_url + '">Resume</a>';
-                        }
-                        const edit_url = url_edit_template.replace('__ID__', id);
-                        const remove_url = url_remove_template.replace('__ID__', id);
-                        return '<a href="' + edit_url + '">Edit</a> | '
-                            + '<a ' +
-                            'data-confirm="Do you really want to remove these news?" ' +
-                            'data-title="Deleting news" ' +
-                            'data-button-ok="Delete" ' +
-                            'data-method="DELETE" ' +
-                            'data-callback="refresh_confirm_table" ' +
-                            'href="' +remove_url +'">Delete</a> ';
-                    }
-                }
-            ],
-        });
-
-        __table.on("renderComplete", function(){
-            refresh_view(document.getElementById("news-content-table"));
-        });
-        document.querySelectorAll("button[data-action]").forEach(button => {
-            button.addEventListener("click", function(e) {
-                e.preventDefault();
-                const action = button.dataset.action;
-                if (!selected_ids.size || !['delete', 'resume'].includes(action)){
-                    return;
-                }
-                const options = {
-                    title: "Attention",
-                    text: "Do you really want to " + action + " " + selected_ids.size + " news?",
-                    icon: "warning" ,
-                    showCancelButton: true,
-                    confirmButtonText: "Yes",
-                    cancelButtonText: "No",
-                };
-                const url = action == "delete"
-                    ? "{{ url_for('admin.admin_news.bulk_remove')}}"
-                    : "{{ url_for('admin.admin_news.bulk_resume')}}";
-                const method  = action == "delete"
-                    ? "DELETE"
-                    : "PUT";
-                Swal.fire(options).then((result) => {
-                    if (!result.isConfirmed)
-                        return;
-                    fetch(url, {
-                        method: method,
-                        headers: {
-                            Accept: 'application/json'
-                        },
-                        body: JSON.stringify({ids: Array.from(selected_ids)})
-                    }).then((res) => {
-                        if (!res.ok)
-                            throw new Error('Error: ' + res.status);
-                        refresh_action_table();
-                    }).catch((err) => {
-                        Swal.fire({
-                            text: err.message,
-                            icon: "error"
-                        });
-                    });
-                });
+    __table.on("renderComplete", function () {
+      refresh_view(document.getElementById("news-content-table"));
+    });
+    document.querySelectorAll("button[data-action]").forEach((button) => {
+      button.addEventListener("click", function (e) {
+        e.preventDefault();
+        const action = button.dataset.action;
+        if (!selected_ids.size || !["delete", "resume"].includes(action)) {
+          return;
+        }
+        const options = {
+          title: "Attention",
+          text:
+            "Do you really want to " +
+            action +
+            " " +
+            selected_ids.size +
+            " news?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
+        };
+        const url =
+          action == "delete"
+            ? "{{ url_for('admin.admin_news.bulk_remove')}}"
+            : "{{ url_for('admin.admin_news.bulk_resume')}}";
+        const method = action == "delete" ? "DELETE" : "PUT";
+        Swal.fire(options).then((result) => {
+          if (!result.isConfirmed) return;
+          fetch(url, {
+            method: method,
+            headers: {
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ ids: Array.from(selected_ids) }),
+          })
+            .then((res) => {
+              if (!res.ok) throw new Error("Error: " + res.status);
+              refresh_action_table();
+            })
+            .catch((err) => {
+              Swal.fire({
+                text: err.message,
+                icon: "error",
+              });
             });
         });
+      });
     });
+  });
 </script>
 {% endblock %}

@@ -1,12 +1,10 @@
-{% from "admin/breadcrumbs.html" import render_breadcrumbs %}
-{% extends "admin/base.html" %}
-{% block layout %}
+{% from "admin/breadcrumbs.html" import render_breadcrumbs %} {% extends
+"admin/base.html" %} {% block layout %}
 <div class="row">
   <aside class="col-md-3">{% include 'admin/aside.html' %}</aside>
 
   <div class="col-md-9">
-    {{render_breadcrumbs(g.breadcrumbs)}}
-    {% block content %} {% endblock %}
+    {{render_breadcrumbs(g.breadcrumbs)}} {% block content %} {% endblock %}
   </div>
 </div>
 {% endblock %}

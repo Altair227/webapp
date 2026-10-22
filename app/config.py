@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from pydantic import Field, AliasChoices
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_FILE = Path(__file__).parent / ".env"
 load_dotenv(str(ENV_FILE))
 

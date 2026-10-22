@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, StringField
 from app.modules.admin.components.fields import DateField, WysiwygField
-from wtforms.validators import DataRequired, Length, URL, optional, Optional
+from app.modules.admin.components.validators import UrlOrPath
+from wtforms.validators import DataRequired, Length, optional, Optional
 from datetime import datetime, timezone
 
 
@@ -34,5 +35,5 @@ class NewsForm(FlaskForm):
     )
     image_url = StringField(
         label="Cover image",
-        validators=[Optional(), URL(), Length(max=255)],
+        validators=[Optional(), UrlOrPath(), Length(max=255)],
     )

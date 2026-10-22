@@ -1,7 +1,7 @@
-from .base import Base
+from .base import Base, TimestampMixin, SafeDeleteMixin
 from typing import TYPE_CHECKING
 from app.common.types import SmallIntEnum, AdminType
-from sqlalchemy import Boolean, Integer, String
+from sqlalchemy import Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import EmailType
 
@@ -9,8 +9,9 @@ if TYPE_CHECKING:
     from .admin_data import AdminData
 
 
-class Admin(Base):
+class Admin(Base, TimestampMixin, SafeDeleteMixin):
     __tablename__ = "admins"
+    __table_args__ = (SmallIntEnum.create_check_constraint("type", AdminType),)
 
     email: Mapped[str] = mapped_column(
         EmailType,

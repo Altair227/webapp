@@ -20,13 +20,10 @@
 }
 
 #navigation .dropdown:hover > .dropdown-menu {
-    display: block;
-    margin-top: 0;
-
-
+  display: block;
+  margin-top: 0;
 }
 
-textarea{
-resize: none;
-
+textarea {
+  resize: none;
 }

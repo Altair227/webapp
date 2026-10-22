@@ -1,4 +1,4 @@
-from flask import Blueprint, session, g, url_for
+from flask import Blueprint, session, g, url_for, redirect, request
 from app.utils.modules import register_child_blueprints
 import app.modules.admin.modules as admin_modules
 from app.models import Admin
@@ -31,6 +31,19 @@ def load_user():
     )
 
 
+# Endpoints available without login (login, forgot, restore...)
+PUBLIC_PREFIX = "admin.admin_auth."
+
+
+@bp.before_request
+def require_auth():
+    if g.user is not None:
+        return None
+    if (request.endpoint or "").startswith(PUBLIC_PREFIX):
+        return None
+    return redirect(url_for("admin.admin_auth.login"))
+
+
 @bp.context_processor
 def inject_user():
     return dict(current_user=g.user)
@@ -38,4 +51,9 @@ def inject_user():
 
 @bp.before_request
 def base_breadcrumbs():
-    g.breadcrumbs = [('Admin', url_for('admin.admin_dashboard.index'))]
+    g.breadcrumbs = [("Admin", url_for("admin.admin_dashboard.index"))]
+
+
+@bp.route("/", strict_slashes=False)
+def index():
+    return redirect(url_for("admin.admin_dashboard.index"))

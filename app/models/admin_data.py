@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
-from .base import Base
-from sqlalchemy import Integer, String, ForeignKey
+from .base import Base, TimestampMixin, SafeDeleteMixin
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from .admin import Admin
 
 
-class AdminData(Base):
+class AdminData(Base, TimestampMixin, SafeDeleteMixin):
     __tablename__ = "admin_data"
 
     admin_id: Mapped[int] = mapped_column(

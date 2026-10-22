@@ -1,4 +1,6 @@
 let FB;
+// jodit-finder runs on :9023 on the same host the page was opened from
+const JODIT_URL = `${window.location.protocol}//${window.location.hostname}:9023/`;
 const format_date = (value) => {
     if (!value) return "";
     let date = new Date(value);
@@ -124,11 +126,11 @@ const refresh_view = (_dom) => {
                 height: 400,
                 filebrowser: {
                     ajax: {
-                        url: 'http://127.0.0.1:9023/'
+                        url: JODIT_URL
                     }
                 },
                 uploader: {
-                    url: 'http://127.0.0.1:9023/?action=fileUpload'
+                    url: JODIT_URL + '?action=fileUpload'
                 }
             });
 
@@ -140,10 +142,10 @@ const refresh_view = (_dom) => {
         if (!FB){
             FB = new Jodit.modules.FileBrowser({
                 ajax: {
-                    url: 'http://127.0.0.1:9023/'
+                    url: JODIT_URL
                 },
                 uploader: {
-                    url: 'http://127.0.0.1:9023/?action=fileUpload'
+                    url: JODIT_URL + '?action=fileUpload'
                 }
             });
         }

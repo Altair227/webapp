@@ -1,16 +1,10 @@
-from .media import Media
-from sqlalchemy import String, Integer, ForeignKey
+from .base import Base, TimestampMixin, SafeDeleteMixin
+from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-class SourceImage(Media):
+class SourceImage(Base, TimestampMixin, SafeDeleteMixin):
     __tablename__ = "source_image"
-
-    id: Mapped[int] = mapped_column(
-        ForeignKey("media.id", ondelete="CASCADE"),
-        primary_key=True,
-        comment="",
-    )
 
     url: Mapped[str] = mapped_column(
         String(255),
@@ -18,25 +12,21 @@ class SourceImage(Media):
         nullable=False,
         comment="",
     )
-
-    filename: Mapped[str] = mapped_column(
+    filename: Mapped[str | None] = mapped_column(
         String(255),
         default=None,
         nullable=True,
         comment="",
     )
-
-    extension: Mapped[str] = mapped_column(
+    extension: Mapped[str | None] = mapped_column(
         String(5),
         default=None,
         nullable=True,
         comment="",
     )
-
-    size: Mapped[int] = mapped_column(
+    size: Mapped[int | None] = mapped_column(
         Integer,
         default=0,
         nullable=True,
         comment="",
     )
-    __mapper_args__ = {"polymorphic_identity": "image"}
