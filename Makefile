@@ -5,7 +5,9 @@
 export HOST_UID := $(shell id -u)
 export HOST_GID := $(shell id -g)
 
-COMPOSE = docker-compose -f docker/docker-compose.yml --project-directory docker
+# "docker compose" (plugin, Linux/WSL) or standalone "docker-compose"
+COMPOSE_BIN := $(shell docker compose version >/dev/null 2>&1 && echo "docker compose" || echo docker-compose)
+COMPOSE = $(COMPOSE_BIN) -f docker/docker-compose.yml --project-directory docker
 APP = $(COMPOSE) run --rm app
 RUNTIME = docker/runtime
 ENV_FILE = app/.env
@@ -25,10 +27,12 @@ check-env:
 	@$(CHECK_ENV)
 
 # Creates runtime dirs and fails fast if Postgres data was removed
-# while the container is still running
+# while the container is still running. The data dir is checked from inside
+# the container: on Linux/WSL it belongs to the postgres user (uid 999,
+# mode 700) and the host user cannot look into it.
 check-runtime: check-env
-	@if [ ! -f $(RUNTIME)/postgres/PG_VERSION ] && \
-		[ -n "$$($(COMPOSE) ps -q --status running postgres 2>/dev/null)" ]; then \
+	@if [ -n "$$($(COMPOSE) ps -q --status running postgres 2>/dev/null)" ] && \
+		! $(COMPOSE) exec -T postgres test -f /var/lib/postgresql/data/PG_VERSION; then \
 		echo "ERROR: $(RUNTIME)/postgres удалён, а postgres ещё запущен."; \
 		echo "       Перезапусти контейнеры: make down && make up"; \
 		exit 1; \
