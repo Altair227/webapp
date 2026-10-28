@@ -8,7 +8,11 @@ from datetime import datetime, timezone
 
 class NewsForm(FlaskForm):
     title = StringField(
-        label="Title", validators=[DataRequired(), Length(min=3, max=255)]
+        label="Title",
+        validators=[
+            DataRequired(),
+            Length(min=3, max=255),
+        ],
     )
     description = TextAreaField(
         label="Announcement",
@@ -31,9 +35,15 @@ class NewsForm(FlaskForm):
     published_at = DateField(
         "Published at",
         default=lambda: datetime.now(timezone.utc),
-        validators=[DataRequired()],
+        validators=[
+            DataRequired(),
+        ],
     )
     image_url = StringField(
         label="Cover image",
-        validators=[Optional(), UrlOrPath(), Length(max=255)],
+        validators=[
+            Optional(),
+            UrlOrPath(),
+            Length(max=255),
+        ],
     )
