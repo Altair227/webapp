@@ -1,11 +1,12 @@
-from .user import User
-from .user_data import UserData
+from . import relations
 from .admin import Admin
 from .admin_data import AdminData
-from .token import EmailToken
-from .source_image import SourceImage
 from .news import News
-from . import relations
+from .source_image import SourceImage
+from .token import EmailToken
+from .user import User
+from .user_data import UserData
+
 
 __all__ = [
     "Admin",

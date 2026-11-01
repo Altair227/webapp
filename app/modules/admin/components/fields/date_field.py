@@ -1,7 +1,8 @@
+from datetime import date, datetime, timezone
+
 from wtforms.fields import DateField as BaseDateField
-from wtforms.widgets import TextInput
 from wtforms.validators import Regexp
-from datetime import datetime, timezone, date
+from wtforms.widgets import TextInput
 
 
 class DateField(BaseDateField):

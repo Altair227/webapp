@@ -1,12 +1,17 @@
-from app.models import Admin, EmailToken
-from app.database import db_session
-from app.utils.security import verify_password
-from app.common.types import EntityType, SmallIntEnum, EmailTokenType
-from app.utils.mailer import get_mailer
-from app.utils.security import generate_password, hash_password
-from flask import session, render_template
-from flask_mail import Message
 from datetime import datetime, timedelta, timezone
+
+from flask import render_template, session
+from flask_mail import Message
+
+from app.common.types import EmailTokenType, EntityType, SmallIntEnum
+from app.database import db_session
+from app.models import Admin, EmailToken
+from app.utils.mailer import get_mailer
+from app.utils.security import (
+    generate_password,
+    hash_password,
+    verify_password,
+)
 
 
 class AuthService:

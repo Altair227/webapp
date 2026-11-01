@@ -1,9 +1,11 @@
 import argparse
+
 from email_validator import EmailNotValidError, validate_email
-from app.utils.security import generate_password, hash_password
-from app.models import Admin
+
+from app.common.types import AdminType, SmallIntEnum
 from app.database import db_session
-from app.common.types import SmallIntEnum, AdminType
+from app.models import Admin
+from app.utils.security import generate_password, hash_password
 
 
 def _create_superadmin() -> None:

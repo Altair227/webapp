@@ -1,6 +1,7 @@
-from .base import Base, TimestampMixin, SafeDeleteMixin
-from sqlalchemy import String, Integer
+from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
+
+from .base import Base, SafeDeleteMixin, TimestampMixin
 
 
 class SourceImage(Base, TimestampMixin, SafeDeleteMixin):

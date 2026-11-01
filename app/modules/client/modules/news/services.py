@@ -1,6 +1,7 @@
-from app.models import News
+from sqlalchemy import func, or_
+
 from app.database import db_session
-from sqlalchemy import or_, func
+from app.models import News
 from app.models.base import to_dict
 
 

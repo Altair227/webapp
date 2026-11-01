@@ -1,9 +1,13 @@
-from .base import Base, TimestampMixin, SafeDeleteMixin
 from typing import TYPE_CHECKING
-from app.common.types import SmallIntEnum, AdminType
+
 from sqlalchemy import Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import EmailType
+
+from app.common.types import AdminType, SmallIntEnum
+
+from .base import Base, SafeDeleteMixin, TimestampMixin
+
 
 if TYPE_CHECKING:
     from .admin_data import AdminData

@@ -1,6 +1,8 @@
-from app.config import get_config
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import scoped_session, sessionmaker
+
+from app.config import get_config
+
 
 config = get_config()
 engine = create_engine(config.postgres.dsn)

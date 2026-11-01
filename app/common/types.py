@@ -1,5 +1,6 @@
 from enum import IntEnum
 from typing import Any
+
 from sqlalchemy import CheckConstraint, SmallInteger
 from sqlalchemy.engine import Dialect
 from sqlalchemy.types import TypeDecorator

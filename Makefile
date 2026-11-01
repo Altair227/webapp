@@ -41,6 +41,7 @@ check-runtime: check-env
 
 format: check-runtime ## Отформатировать код (ruff + prettier)
 	@echo "formating..." ; \
+	$(APP) ruff check --select I --fix .; \
 	$(APP) ruff format .; \
 	$(COMPOSE) run --rm prettier
 
@@ -50,6 +51,7 @@ migrate-create: check-runtime ## Создать миграцию (autogenerate) 
 	if [ -n "$$name" ]; then \
 		echo "Create migration '$$name'"; \
 		$(APP) alembic revision --autogenerate -m "$$name" && \
+		$(APP) ruff check --select I --fix migrations/versions; \
 		$(APP) ruff format migrations/versions; \
 	else \
 		echo "Name cannot be empty"; \

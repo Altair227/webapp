@@ -1,15 +1,18 @@
 from flask import (
     Blueprint,
-    render_template,
-    flash,
-    request,
     abort,
+    flash,
     redirect,
+    render_template,
+    request,
     url_for,
 )
-from .forms import LoginForm, ForgotForm
-from .services import AuthService
+
 from app.modules.admin.decorators import auth_required
+
+from .forms import ForgotForm, LoginForm
+from .services import AuthService
+
 
 bp = Blueprint(
     "admin_auth",

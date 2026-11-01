@@ -1,7 +1,8 @@
-from flask import Blueprint, Flask
 import importlib
 import pkgutil
 from types import ModuleType
+
+from flask import Blueprint, Flask
 
 
 def register_child_blueprints(

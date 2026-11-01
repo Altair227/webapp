@@ -1,11 +1,13 @@
 from typing import Any, Literal
-from sqlalchemy import Table, pool, engine_from_config
-from sqlalchemy.engine import Connection
-from sqlalchemy_utils import EmailType
+
 from alembic import context
 from alembic.autogenerate.api import AutogenContext
+from sqlalchemy import Table, engine_from_config, pool
+from sqlalchemy.engine import Connection
+from sqlalchemy_utils import EmailType
+
+from app.common.types import SmallIntEnum
 from app.config import get_config
-from app.models.base import Base
 from app.models import (
     Admin,
     AdminData,
@@ -15,8 +17,8 @@ from app.models import (
     User,
     UserData,
 )
+from app.models.base import Base
 from app.models.relations import _r_news_source_image
-from app.common.types import SmallIntEnum
 from app.utils.logger import init_logger
 
 

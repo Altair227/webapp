@@ -1,8 +1,10 @@
-from typing import TYPE_CHECKING
-from .base import Base, TimestampMixin, SafeDeleteMixin
 from datetime import date
-from sqlalchemy import String, ForeignKey, Date
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Date, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from .base import Base, SafeDeleteMixin, TimestampMixin
 
 
 if TYPE_CHECKING:

@@ -1,5 +1,6 @@
-from flask import g, url_for, redirect
 from functools import wraps
+
+from flask import g, redirect, url_for
 
 
 def auth_required(

@@ -1,8 +1,11 @@
-from .base import Base, TimestampMixin, SafeDeleteMixin
-from .relations import _r_news_source_image
 from typing import TYPE_CHECKING
-from sqlalchemy import String, Text, DateTime, func
+
+from sqlalchemy import DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from .base import Base, SafeDeleteMixin, TimestampMixin
+from .relations import _r_news_source_image
+
 
 if TYPE_CHECKING:
     from .source_image import SourceImage
@@ -44,4 +47,5 @@ class News(Base, TimestampMixin, SafeDeleteMixin):
         secondary=_r_news_source_image,
         lazy="select",
         passive_deletes=True,
+        order_by="SourceImage.id",
     )

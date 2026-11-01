@@ -1,13 +1,15 @@
 from flask import (
     Blueprint,
-    render_template,
-    flash,
-    request,
     abort,
+    flash,
     redirect,
+    render_template,
+    request,
     url_for,
 )
+
 from app.modules.admin.decorators import auth_required
+
 
 bp = Blueprint(
     "admin_dashboard",

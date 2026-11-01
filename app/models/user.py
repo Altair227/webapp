@@ -1,8 +1,11 @@
-from .base import Base, TimestampMixin, SafeDeleteMixin
 from typing import TYPE_CHECKING
+
 from sqlalchemy import Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import EmailType
+
+from .base import Base, SafeDeleteMixin, TimestampMixin
+
 
 if TYPE_CHECKING:
     from .user_data import UserData

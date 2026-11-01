@@ -1,9 +1,12 @@
-from app.models import News
-from app.database import db_session
-from sqlalchemy import or_, desc, true
-from app.models.base import get_sortable_columns, to_dict
 from datetime import datetime
 from typing import List
+
+from sqlalchemy import desc, or_, true
+
+from app.database import db_session
+from app.models import News
+from app.models.base import get_sortable_columns, to_dict
+
 
 SORTABLE = get_sortable_columns(News)
 

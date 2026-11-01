@@ -1,5 +1,7 @@
-from flask import Blueprint, render_template, request, abort
+from flask import Blueprint, abort, render_template, request
+
 from .services import NewsService
+
 
 bp = Blueprint(
     "client_news",

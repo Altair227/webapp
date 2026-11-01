@@ -1,8 +1,11 @@
-from .base import Base, TimestampMixin
-from app.common.types import EntityType, SmallIntEnum, EmailTokenType
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, DateTime
 from datetime import datetime
+
+from sqlalchemy import DateTime, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.common.types import EmailTokenType, EntityType, SmallIntEnum
+
+from .base import Base, TimestampMixin
 
 
 class EmailToken(Base, TimestampMixin):

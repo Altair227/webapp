@@ -1,13 +1,14 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any
-from sqlalchemy import Boolean, DateTime, event, func, Integer, inspect
+
+from sqlalchemy import Boolean, DateTime, Integer, event, func, inspect
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
     Mapper,
-    mapped_column,
     declared_attr,
+    mapped_column,
 )
 
 

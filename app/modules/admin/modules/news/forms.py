@@ -1,9 +1,11 @@
+from datetime import datetime, timezone
+
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, StringField
+from wtforms import StringField, TextAreaField
+from wtforms.validators import DataRequired, Length, Optional, optional
+
 from app.modules.admin.components.fields import DateField, WysiwygField
 from app.modules.admin.components.validators import UrlOrPath
-from wtforms.validators import DataRequired, Length, optional, Optional
-from datetime import datetime, timezone
 
 
 class NewsForm(FlaskForm):

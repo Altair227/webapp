@@ -1,8 +1,10 @@
-from flask import Blueprint, session, g, url_for, redirect, request
-from app.utils.modules import register_child_blueprints
+from flask import Blueprint, g, redirect, request, session, url_for
+
 import app.modules.admin.modules as admin_modules
-from app.models import Admin
 from app.database import db_session
+from app.models import Admin
+from app.utils.modules import register_child_blueprints
+
 
 bp = Blueprint(
     "admin",

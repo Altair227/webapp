@@ -1,7 +1,8 @@
 """Association tables for N:M relations (_r_<left>_<right>)."""
 
-from .base import Base
 from sqlalchemy import Column, ForeignKey, Table
+
+from .base import Base
 
 
 _r_news_source_image = Table(

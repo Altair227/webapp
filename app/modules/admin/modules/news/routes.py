@@ -1,17 +1,20 @@
 from flask import (
     Blueprint,
-    render_template,
-    request,
+    abort,
+    flash,
+    g,
     jsonify,
     redirect,
+    render_template,
+    request,
     url_for,
-    flash,
-    abort,
-    g,
 )
+
 from app.modules.admin.decorators import auth_required, breadcrumbs
-from .services import NewsService
+
 from .forms import NewsForm
+from .services import NewsService
+
 
 bp = Blueprint(
     "admin_news",

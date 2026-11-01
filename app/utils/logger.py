@@ -1,8 +1,9 @@
 import logging
 from logging.handlers import RotatingFileHandler
-from app.config import BASE_DIR, LoggerConfig
-from typing import ClassVar
 from pathlib import Path
+from typing import ClassVar
+
+from app.config import BASE_DIR, LoggerConfig
 
 
 class Logger:

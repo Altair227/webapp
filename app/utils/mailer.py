@@ -1,5 +1,6 @@
-from flask_mail import Mail
 from functools import lru_cache
+
+from flask_mail import Mail
 
 
 @lru_cache

@@ -1,6 +1,8 @@
+import json
+from typing import Any
+
 from wtforms.fields import Field
 from wtforms.widgets import HiddenInput
-from typing import Any
 
 
 class ImageListField(Field):
@@ -17,7 +19,7 @@ class ImageListField(Field):
         validators: Any = None,
         max_items: int = 50,
         **kwargs: Any,
-    ):
+    ) -> None:
         render_kw = {
             "data-field-type": "images",
             "data-max-items": str(max_items),
@@ -31,21 +33,30 @@ class ImageListField(Field):
         )
         self.max_items = max_items
 
-    def _value(self):
-        """
-        Returns the value of the field as a string. If the data is None, it returns an empty string.
-        """
-        if self.data:
-            return str(self.data)
-        else:
-            return ""
+    def process_data(self, value: Any) -> None:
+        self.data = [
+            item if isinstance(item, str) else item.url
+            for item in (value or [])
+        ]
 
-    def process_formdata(self, valuelist):
-        """
-        Processes incoming form data and sets the field's data attribute.
-        If valuelist is empty, it sets data to None. Otherwise, it takes the first value from valuelist.
-        """
-        if valuelist:
-            self.data = valuelist[0]
-        else:
-            self.data = None
+    def _value(self) -> str:
+        return json.dumps(self.data or [])
+
+    def process_formdata(self, valuelist: list[str]) -> None:
+        if not valuelist or not valuelist[0].strip():
+            self.data = []
+            return
+        try:
+            items = json.loads(valuelist[0])
+        except ValueError as e:
+            self.data = []
+            raise ValueError("Invalid image list.") from e
+        if not isinstance(items, list) or not all(
+            isinstance(item, str) for item in items
+        ):
+            self.data = []
+            raise ValueError("Invalid image list.")
+        # strip, drop empty and duplicate URLs, keep order
+        self.data = list(dict.fromkeys(i.strip() for i in items if i.strip()))
+        if len(self.data) > self.max_items:
+            raise ValueError(f"No more than {self.max_items} images.")

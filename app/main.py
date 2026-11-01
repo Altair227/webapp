@@ -1,12 +1,15 @@
 import logging
-from app.database import shutdown_session
-from flask import Flask, render_template, send_from_directory
-from app.config import get_config
-from app.utils.logger import init_logger
-from app.utils.modules import register_child_blueprints
-import app.modules as app_pkg
-from app.utils.mailer import get_mailer
 from pathlib import Path
+
+from flask import Flask, render_template, send_from_directory
+
+import app.modules as app_pkg
+from app.config import get_config
+from app.database import shutdown_session
+from app.utils.logger import init_logger
+from app.utils.mailer import get_mailer
+from app.utils.modules import register_child_blueprints
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # .../app
 UPLOAD_DIR = BASE_DIR / "web" / "upload"
