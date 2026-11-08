@@ -1,3 +1,4 @@
+from collections.abc import Collection
 from datetime import UTC, datetime
 from typing import Any
 
@@ -5,6 +6,7 @@ from sqlalchemy import Boolean, DateTime, Integer, event, func, inspect
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import (
     DeclarativeBase,
+    InstrumentedAttribute,
     Mapped,
     Mapper,
     declared_attr,
@@ -12,11 +14,16 @@ from sqlalchemy.orm import (
 )
 
 
-def get_sortable_columns(model):
+def get_sortable_columns(
+    model: type[Base],
+) -> dict[str, InstrumentedAttribute[Any]]:
     return {c.key: getattr(model, c.key) for c in inspect(model).columns}
 
 
-def to_dict(model, exclude=None):
+def to_dict(
+    model: type[Base],
+    exclude: Collection[str] | None = None,
+) -> dict[str, Any]:
     if not exclude:
         exclude = set()
     return {

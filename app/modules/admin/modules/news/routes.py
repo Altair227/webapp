@@ -25,25 +25,25 @@ bp = Blueprint(
 
 
 @bp.before_request
-def crumbs():
+def crumbs() -> None:
     g.breadcrumbs.append(("News", url_for("admin.admin_news.index")))
 
 
 @bp.get("/")
 @auth_required(True, "admin.admin_auth.login")
-def index():
+def index() -> str:
     return render_template("admin_news/index.html")
 
 
 @bp.route("/search")
 @auth_required(True, "admin.admin_auth.login")
-def search():
+def search() -> str:
     page = int(request.args.get("page", 1))
     size = int(request.args.get("size", 25))
     query = request.args.get("search", "").strip()
     sort_field = request.args.get("sort[0][field]")
     direction = request.args.get("sort[0][dir]")
-    total, data = NewsService.list(
+    total, data = NewsService.get_list(
         page=page,
         size=size,
         search=query,

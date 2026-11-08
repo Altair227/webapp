@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 from sqlalchemy import desc, or_, true
 
@@ -14,10 +13,10 @@ SORTABLE = get_sortable_columns(News)
 
 class NewsService:
     @staticmethod
-    def list(
+    def get_list(
         page: int = 1,
         size: int = 25,
-        search: str = None,
+        search: str | None = None,
         field: str = "id",
         direction: str = "desc",
     ) -> tuple[int, list[News]]:
@@ -36,7 +35,7 @@ class NewsService:
                 or_(News.title.ilike(like), News.description.ilike(like))
             )
         total = query.count()
-        column = SORTABLE.get(field)
+        column = SORTABLE[field]
         query = query.order_by(
             column.desc() if direction == "desc" else column.asc()
         )
@@ -100,7 +99,7 @@ class NewsService:
             return str(e)
 
     @staticmethod
-    def remove(_id: List[int]) -> None | str:
+    def remove(_id: list[int]) -> None | str:
         db_session.query(News).filter(News.id.in_(_id)).update(
             {"is_deleted": True}, synchronize_session=False
         )
@@ -111,7 +110,7 @@ class NewsService:
             return str(e)
 
     @staticmethod
-    def resume(_id: List[int]) -> None | str:
+    def resume(_id: list[int]) -> None | str:
         db_session.query(News).filter(News.id.in_(_id)).update(
             {"is_deleted": False}, synchronize_session=False
         )

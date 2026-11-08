@@ -94,4 +94,4 @@ file_template = "%%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d%%(seco
 [tool.pylint."messages control"]
 # SQLAlchemy builds func.now/func.count/... dynamically, pylint reports
 # them as not callable (false positive)
-disable = ["not-callable"]
+disable = ["not-callable", "missing-module-docstring", "missing-class-docstring", "missing-function-docstring"]
