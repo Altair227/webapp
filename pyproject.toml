@@ -92,4 +92,6 @@ version_path_separator = "os"
 file_template = "%%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d%%(second).2d_%%(slug)s"
 
 [tool.pylint."messages control"]
-disable = ["non-callable"]
+# SQLAlchemy builds func.now/func.count/... dynamically, pylint reports
+# them as not callable (false positive)
+disable = ["not-callable"]
