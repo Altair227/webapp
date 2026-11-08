@@ -70,6 +70,7 @@ def create():
             content=form.content.data,
             published_at=form.published_at.data,
             image_url=form.image_url.data,
+            images=form.images.data,
         )
         if not error:
             return redirect(url_for("admin.admin_news.index"))
@@ -93,6 +94,7 @@ def update(_id):
             content=form.content.data,
             published_at=form.published_at.data,
             image_url=form.image_url.data,
+            images=form.images.data,
         )
         if not error:
             return redirect(url_for("admin.admin_news.index"))

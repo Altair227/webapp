@@ -99,6 +99,88 @@ const open_confirm = (link)=>{
 };
 
 
+const get_file_browser = () => {
+    if (!FB){
+        FB = new Jodit.modules.FileBrowser({
+            ajax: {
+                url: JODIT_URL
+            },
+            uploader: {
+                url: JODIT_URL + '?action=fileUpload'
+            }
+        });
+    }
+    return FB;
+};
+
+// file manager result -> list of URLs (root-relative for local files)
+const selected_urls = (data) => data.files.map(
+    file => file.startsWith('http') ? file : data.baseurl + file
+);
+
+// input[data-field-type="images"] keeps a JSON array of URLs,
+// div[data-image-list] shows it as thumbnails with remove buttons
+const image_list = (input, _dom) => {
+    if (input.dataset.imagesBound){
+        return;
+    }
+    input.dataset.imagesBound = "true";
+    const list = _dom.querySelector(`[data-image-list="${input.id}"]`);
+    const add = _dom.querySelector(`button[data-button-type="image-list-add"][data-select-field="${input.id}"]`);
+    const max_items = parseInt(input.dataset.maxItems || "0", 10);
+    let urls;
+    try {
+        urls = JSON.parse(input.value || "[]");
+    } catch (e) {
+        urls = [];
+    }
+    const render = () => {
+        input.value = JSON.stringify(urls);
+        if (add) {
+            add.disabled = max_items > 0 && urls.length >= max_items;
+        }
+        if (!list) {
+            return;
+        }
+        list.innerHTML = "";
+        urls.forEach((url, index) => {
+            const item = document.createElement("div");
+            item.className = "image-list-item";
+            const img = document.createElement("img");
+            img.src = url;
+            img.alt = "";
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "btn btn-danger btn-sm image-list-remove";
+            remove.title = "Remove";
+            remove.innerHTML = '<i class="bi bi-x"></i>';
+            remove.addEventListener("click", () => {
+                urls.splice(index, 1);
+                render();
+            });
+            item.append(img, remove);
+            list.append(item);
+        });
+    };
+    if (add) {
+        add.addEventListener("click", e => {
+            e.preventDefault();
+            get_file_browser().open(data => {
+                for (const url of selected_urls(data)) {
+                    if (max_items > 0 && urls.length >= max_items) {
+                        break;
+                    }
+                    if (!urls.includes(url)) {
+                        urls.push(url);
+                    }
+                }
+                render();
+            }, true);
+        });
+    }
+    render();
+};
+
 const refresh_view = (_dom) => {
     _dom.querySelectorAll('a[data-modal]').forEach(open_modal);
     _dom.querySelectorAll('a[data-confirm]').forEach(link => {
@@ -137,34 +219,24 @@ const refresh_view = (_dom) => {
         }
     }
 
+    _dom.querySelectorAll('input[data-field-type="images"]').forEach(
+        input => image_list(input, _dom)
+    );
+
     const filemanagers = _dom.querySelectorAll('button[data-button-type="filemanager"]');
     if (filemanagers.length) {
-        if (!FB){
-            FB = new Jodit.modules.FileBrowser({
-                ajax: {
-                    url: JODIT_URL
-                },
-                uploader: {
-                    url: JODIT_URL + '?action=fileUpload'
-                }
-            });
-        }
         for (let fm of filemanagers) {
 
             if (fm.dataset.fmBound){
-                return;
+                continue;
             }
             const type = fm.dataset.selectType || "file";
             const field = fm.dataset.selectField ? _dom.querySelector("#" + fm.dataset.selectField ) : null;
             fm.addEventListener("click", e=>{
                 e.preventDefault();
-                FB.open(data=>{
+                get_file_browser().open(data=>{
                     if (field){
-                        let value = data.files[0];
-                        if (!value.startsWith('http')){
-                            value = data.baseurl + value;
-                        }
-                        field.value = value;
+                        field.value = selected_urls(data)[0];
                         field.dispatchEvent(new Event('change',{bubbles: true}));
                     }
                 }, type == "image");

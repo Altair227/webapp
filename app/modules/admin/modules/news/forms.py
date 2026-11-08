@@ -2,10 +2,14 @@ from datetime import datetime, timezone
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField
-from wtforms.validators import DataRequired, Length, Optional, optional
+from wtforms.validators import DataRequired, Length, Optional
 
-from app.modules.admin.components.fields import DateField, WysiwygField
-from app.modules.admin.components.validators import UrlOrPath
+from app.modules.admin.components.fields import (
+    DateField,
+    ImageListField,
+    WysiwygField,
+)
+from app.modules.admin.components.validators import EachUrlOrPath, UrlOrPath
 
 
 class NewsForm(FlaskForm):
@@ -47,5 +51,11 @@ class NewsForm(FlaskForm):
             Optional(),
             UrlOrPath(),
             Length(max=255),
+        ],
+    )
+    images = ImageListField(
+        label="Photos",
+        validators=[
+            EachUrlOrPath(),
         ],
     )

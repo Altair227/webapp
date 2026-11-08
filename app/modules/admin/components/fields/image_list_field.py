@@ -6,9 +6,11 @@ from wtforms.widgets import HiddenInput
 
 
 class ImageListField(Field):
-    """
-    A custom WTForms field for handling a list of images.
-    This field is designed to work with a hidden input widget, allowing for the storage of image data in a serialized format.
+    """List of image URLs, posted as a JSON array in one hidden input.
+
+    main.js turns the input (data-field-type="images") into a gallery
+    with "Add photos" (file manager, several files at once) and remove
+    buttons, and writes the list back into the input.
     """
 
     widget = HiddenInput()

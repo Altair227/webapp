@@ -25,6 +25,17 @@
 <hr />
 <h3>Description</h3>
 <p>{{data.description}}</p>
+{% if data.images %}
+<hr />
+<h3>Photos</h3>
+<div class="image-list">
+  {% for image in data.images %}
+  <a class="image-list-item" href="{{ image.url }}" target="_blank">
+    <img src="{{ image.url }}" alt="{{ image.filename or '' }}" />
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
 <hr />
 <h3>Page content</h3>
 {{data.content | safe}}
