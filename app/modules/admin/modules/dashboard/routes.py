@@ -1,12 +1,4 @@
-from flask import (
-    Blueprint,
-    abort,
-    flash,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from flask import Blueprint, render_template
 
 from app.modules.admin.decorators import auth_required
 
@@ -21,5 +13,5 @@ bp = Blueprint(
 
 @bp.route("/", methods=["GET"])
 @auth_required(True, "admin.admin_auth.login")
-def index():
+def index() -> str:
     return render_template("admin_dashboard/index.html")

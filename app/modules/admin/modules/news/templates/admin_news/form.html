@@ -67,23 +67,10 @@
       </button>
     </div>
   </div>
+  <h3>Additional images</h3>
   <div class="mb-3">
     <label class="form-label">{{ form.images.label.text }}</label>
-    {# hidden JSON input; main.js renders the gallery next to it #} {{
-    form.images() }}
-    <div
-      class="image-list{{ ' is-invalid' if form.images.errors }}"
-      data-image-list="{{ form.images.id }}"
-    ></div>
-    <button
-      class="btn btn-outline-primary btn-sm mt-2"
-      type="button"
-      data-button-type="image-list-add"
-      data-select-field="{{ form.images.id }}"
-    >
-      <i class="bi bi-images"></i>
-      Add photos
-    </button>
+    {{ form.images() }}
   </div>
   {% if is_create %}
   <button class="btn btn-primary" type="submit">Create</button>

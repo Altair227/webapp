@@ -9,7 +9,7 @@ engine = create_engine(config.postgres.dsn)
 db_session = scoped_session(sessionmaker(bind=engine))
 
 
-def shutdown_session(exception=None) -> None:
+def shutdown_session(exception: BaseException | None = None) -> None:
     if exception:
         db_session.rollback()
     db_session.remove()

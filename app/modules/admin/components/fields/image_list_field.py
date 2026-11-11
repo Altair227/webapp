@@ -1,19 +1,56 @@
-import json
 from typing import Any
 
+from markupsafe import Markup, escape
 from wtforms.fields import Field
-from wtforms.widgets import HiddenInput
+
+
+class ImageListWidget:
+    """One row per image: [url input][browse][+][-].
+
+    Every input has the field name, so the browser posts all of them and
+    the field receives the list. main.js (data-field-type="images") wires
+    the buttons: browse opens the file manager, + adds a row, - removes it.
+    """
+
+    def __call__(self, field: ImageListField, **kwargs: Any) -> Markup:
+        css = "image-rows" + (" is-invalid" if field.errors else "")
+        rows = "".join(
+            self._row(field.name, url) for url in (field.data or [""])
+        )
+        return Markup(
+            f'<div class="{css}" id="{escape(field.id)}"'
+            f' data-field-type="images"'
+            f' data-max-items="{field.max_items}">{rows}</div>'
+        )
+
+    @staticmethod
+    def _row(name: str, url: str) -> str:
+        return (
+            '<div class="input-group mb-2 image-row">'
+            f'<input type="text" class="form-control" name="{escape(name)}"'
+            f' value="{escape(url)}"'
+            ' placeholder="Paste a link or choose a photo">'
+            '<button class="btn btn-primary" type="button"'
+            ' data-image-action="browse" title="Browse">'
+            '<i class="bi bi-folder"></i></button>'
+            '<button class="btn btn-outline-success" type="button"'
+            ' data-image-action="add" title="Add row">'
+            '<i class="bi bi-plus-lg"></i></button>'
+            '<button class="btn btn-outline-danger" type="button"'
+            ' data-image-action="remove" title="Remove">'
+            '<i class="bi bi-dash-lg"></i></button>'
+            "</div>"
+        )
 
 
 class ImageListField(Field):
-    """List of image URLs, posted as a JSON array in one hidden input.
+    """List of image URLs, one text input per image (see ImageListWidget).
 
-    main.js turns the input (data-field-type="images") into a gallery
-    with "Add photos" (file manager, several files at once) and remove
-    buttons, and writes the list back into the input.
+    data is list[str]. Populated from obj, it accepts a list of URLs or of
+    objects with a .url attribute (e.g. News.images -> SourceImage).
     """
 
-    widget = HiddenInput()
+    widget = ImageListWidget()
 
     def __init__(
         self,
@@ -22,17 +59,7 @@ class ImageListField(Field):
         max_items: int = 50,
         **kwargs: Any,
     ) -> None:
-        render_kw = {
-            "data-field-type": "images",
-            "data-max-items": str(max_items),
-            **(kwargs.pop("render_kw", None) or {}),
-        }
-        super().__init__(
-            label=label,
-            validators=validators,
-            render_kw=render_kw,
-            **kwargs,
-        )
+        super().__init__(label=label, validators=validators, **kwargs)
         self.max_items = max_items
 
     def process_data(self, value: Any) -> None:
@@ -41,24 +68,10 @@ class ImageListField(Field):
             for item in (value or [])
         ]
 
-    def _value(self) -> str:
-        return json.dumps(self.data or [])
-
     def process_formdata(self, valuelist: list[str]) -> None:
-        if not valuelist or not valuelist[0].strip():
-            self.data = []
-            return
-        try:
-            items = json.loads(valuelist[0])
-        except ValueError as e:
-            self.data = []
-            raise ValueError("Invalid image list.") from e
-        if not isinstance(items, list) or not all(
-            isinstance(item, str) for item in items
-        ):
-            self.data = []
-            raise ValueError("Invalid image list.")
-        # strip, drop empty and duplicate URLs, keep order
-        self.data = list(dict.fromkeys(i.strip() for i in items if i.strip()))
+        # strip, drop empty rows and duplicate URLs, keep order
+        self.data = list(
+            dict.fromkeys(v.strip() for v in valuelist if v.strip())
+        )
         if len(self.data) > self.max_items:
             raise ValueError(f"No more than {self.max_items} images.")

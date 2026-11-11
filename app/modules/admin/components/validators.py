@@ -1,11 +1,7 @@
 from typing import Any
+from urllib.parse import urlsplit
 
-from wtforms.validators import URL, ValidationError
-
-
-# Same rules as wtforms URL(); require_tld=False accepts
-# http://localhost:9000/... in development
-_URL = URL(require_tld=False)
+from wtforms.validators import ValidationError
 
 
 def is_url_or_path(value: str) -> bool:
@@ -13,12 +9,18 @@ def is_url_or_path(value: str) -> bool:
 
     Root-relative paths come from the file manager, whose baseurl is
     "/upload/". Protocol-relative values (//host/x.png) are refused.
+    URLs need http(s) and a host; localhost is fine in development.
     """
     value = value.strip()
-    if value.startswith("/") and value[1:2] not in ("/", "\\"):
-        return not any(char.isspace() for char in value)
-    match = _URL.regex.match(value)
-    return bool(match and _URL.validate_hostname(match.group("host")))
+    if not value or any(char.isspace() for char in value):
+        return False
+    if value.startswith("/"):
+        return value[1:2] not in ("/", "\\")
+    try:
+        parts = urlsplit(value)
+        return parts.scheme in ("http", "https") and bool(parts.hostname)
+    except ValueError:  # e.g. "http://[::1" or a bad port
+        return False
 
 
 class UrlOrPath:

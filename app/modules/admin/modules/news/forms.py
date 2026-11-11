@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional
@@ -38,11 +36,11 @@ class NewsForm(FlaskForm):
             ),
         ],
     )
+    # empty: the news is shown on the site right away
     published_at = DateField(
         "Published at",
-        default=lambda: datetime.now(timezone.utc),
         validators=[
-            DataRequired(),
+            Optional(),
         ],
     )
     image_url = StringField(

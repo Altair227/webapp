@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, String, Text, func
+from sqlalchemy import DateTime, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, SafeDeleteMixin, TimestampMixin
@@ -24,19 +25,19 @@ class News(Base, TimestampMixin, SafeDeleteMixin):
         nullable=False,
         comment="",
     )
-    content: Mapped[bool] = mapped_column(
+    content: Mapped[str] = mapped_column(
         Text,
         nullable=False,
         comment="",
     )
-    published_at: Mapped[DateTime] = mapped_column(
+    # None: visible on the site right away (created_at is used instead)
+    published_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-        onupdate=func.now(),
+        default=None,
+        nullable=True,
         comment="",
     )
-    image_url: Mapped[str] = mapped_column(
+    image_url: Mapped[str | None] = mapped_column(
         String(255),
         default=None,
         nullable=True,

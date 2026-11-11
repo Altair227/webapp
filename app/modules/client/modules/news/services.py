@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy import func, or_
 
 from app.database import db_session
@@ -10,8 +12,8 @@ class NewsService:
     def list(
         page: int = 1,
         size: int = 25,
-        search: str = None,
-    ) -> tuple[int, list[News]]:
+        search: str | None = None,
+    ) -> list[dict[str, Any]]:
         if size < 1:
             size = 1
         if page < 1:
@@ -28,12 +30,10 @@ class NewsService:
             query = query.filter(
                 or_(News.title.ilike(like), News.description.ilike(like))
             )
-            query = query.order_by(
-                func.greatest(
-                    func.coalesce(News.published_at, News.created_at),
-                    News.created_at,
-                ).desc()
-            )
+        # date the news appeared on the site
+        query = query.order_by(
+            func.coalesce(News.published_at, News.created_at).desc()
+        )
         rows = query.offset((page - 1) * size).limit(size).all()
         return [to_dict(news) for news in rows]
 

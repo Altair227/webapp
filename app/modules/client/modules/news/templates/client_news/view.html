@@ -20,21 +20,29 @@
 
   <div class="news-content">{{ item.content | safe }}</div>
 
-  {% if item.images %}
-  <div class="row g-3 mt-4 news-gallery">
-    {% for image in item.images if not image.is_deleted %}
-    <div class="col-6 col-md-4 col-lg-3">
-      <a href="{{ image.url }}" target="_blank">
-        <img
-          src="{{ image.url }}"
-          class="img-fluid rounded"
-          alt="{{ item.title }} — {{ loop.index }}"
-          loading="lazy"
-        />
-      </a>
+  {% set photos = item.images | rejectattr("is_deleted") | list %}
+  {% if photos %}
+  <section class="news-gallery mt-5">
+    <h3 class="mb-3">Дополнительные фото</h3>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+      {% for image in photos %}
+      <div class="col">
+        <a
+          class="ratio ratio-4x3 d-block rounded overflow-hidden shadow-sm"
+          href="{{ image.url }}"
+          target="_blank"
+        >
+          <img
+            src="{{ image.url }}"
+            class="object-fit-cover"
+            alt="{{ item.title }} — фото {{ loop.index }}"
+            loading="lazy"
+          />
+        </a>
+      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
-  </div>
+  </section>
   {% endif %}
 </article>
 

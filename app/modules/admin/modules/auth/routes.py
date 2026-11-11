@@ -7,6 +7,7 @@ from flask import (
     request,
     url_for,
 )
+from werkzeug.wrappers import Response as BaseResponse
 
 from app.modules.admin.decorators import auth_required
 
@@ -24,12 +25,13 @@ bp = Blueprint(
 
 @bp.route("/login", methods=["GET", "POST"])
 @auth_required(False, "admin.admin_dashboard.index")
-def login():
+def login() -> str | BaseResponse:
     form = LoginForm()
     if form.validate_on_submit():
         user, error = AuthService.login(
-            email=form.email.data,
-            password=form.password.data,
+            # DataRequired() guarantees strings; `or ""` narrows the type
+            email=form.email.data or "",
+            password=form.password.data or "",
             remember_me=form.remember_me.data,
         )
         if error:
@@ -41,11 +43,11 @@ def login():
 
 @bp.route("/forgot", methods=["GET", "POST"])
 @auth_required(False, "admin.admin_dashboard.index")
-def forgot():
+def forgot() -> str:
     is_sent = False
     form = ForgotForm()
     if form.validate_on_submit():
-        AuthService.forgot(email=form.email.data)
+        AuthService.forgot(email=form.email.data or "")
         is_sent = True
     return render_template(
         "admin_auth/forgot.html", form=form, is_sent=is_sent
@@ -54,7 +56,7 @@ def forgot():
 
 @bp.route("/restore", methods=["GET"])
 @auth_required(False, "admin.admin_dashboard.index")
-def restore():
+def restore() -> str:
     token = request.args.get("token")
     if not token:
         abort(400, description="Token not found")
@@ -66,6 +68,6 @@ def restore():
 
 @bp.route("/logout", methods=["GET"])
 @auth_required(True, "admin.admin_auth.login")
-def logout():
+def logout() -> BaseResponse:
     AuthService.logout()
     return redirect("/")

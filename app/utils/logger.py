@@ -26,9 +26,7 @@ class Logger:
     ) -> logging.Logger:
         logger = logging.getLogger(name)
         logging_level = config.level if config else logging.DEBUG
-        logging_format = (
-            "%(asctime)s - %(name)s - %(levelname)s: %(message)s",
-        )
+        logging_format = "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
         if config:
             logging_format = config.format
         logging_date_format = "%Y-%m-%d %H:%M:%S"

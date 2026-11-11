@@ -1,7 +1,8 @@
 import logging
 from pathlib import Path
 
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, Response, render_template, send_from_directory
+from werkzeug.exceptions import HTTPException
 
 import app.modules as app_pkg
 from app.config import get_config
@@ -34,7 +35,8 @@ def create_app() -> Flask:
     mailer = get_mailer()
     mailer.init_app(app)
     register_child_blueprints(app, app_pkg, routes_module_name="main")
-    print(config.mailer)
+    # host/port only: the mailer config also holds the SMTP password
+    logger.info("Mailer: %s:%s", config.mailer.host, config.mailer.port)
 
     app.logger.handlers = logger.handlers
     app.logger.setLevel(logger.level)
@@ -50,15 +52,15 @@ def create_app() -> Flask:
     app.config["UPLOAD_DIR"] = str(UPLOAD_DIR)
 
     @app.route("/upload/<path:filename>")
-    def uploaded_file(filename):
+    def uploaded_file(filename: str) -> Response:
         return send_from_directory(app.config["UPLOAD_DIR"], filename)
 
     @app.errorhandler(404)
-    def error_404(error):
+    def error_404(error: HTTPException) -> tuple[str, int]:
         return render_template("errors/404.html", error=error), 404
 
     @app.errorhandler(400)
-    def error_400(error):
+    def error_400(error: HTTPException) -> tuple[str, int]:
         return render_template("errors/400.html", error=error), 400
 
     return app

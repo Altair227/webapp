@@ -21,7 +21,7 @@ def get_sortable_columns(
 
 
 def to_dict(
-    model: type[Base],
+    model: Base,
     exclude: Collection[str] | None = None,
 ) -> dict[str, Any]:
     if not exclude:
@@ -77,6 +77,6 @@ class SafeDeleteMixin:
 
 @event.listens_for(TimestampMixin, "before_update", propagate=True)
 def before_update(
-    _mapper: Mapper[Any], _connection: Connection, target: Base
+    _mapper: Mapper[Any], _connection: Connection, target: TimestampMixin
 ) -> None:
     target.updated_at = datetime.now(UTC)

@@ -1,5 +1,6 @@
 from flask import (
     Blueprint,
+    Response,
     abort,
     flash,
     g,
@@ -9,6 +10,7 @@ from flask import (
     request,
     url_for,
 )
+from werkzeug.wrappers import Response as BaseResponse
 
 from app.modules.admin.decorators import auth_required, breadcrumbs
 
@@ -37,7 +39,7 @@ def index() -> str:
 
 @bp.route("/search")
 @auth_required(True, "admin.admin_auth.login")
-def search() -> str:
+def search() -> Response:
     page = int(request.args.get("page", 1))
     size = int(request.args.get("size", 25))
     query = request.args.get("search", "").strip()
@@ -61,13 +63,14 @@ def search() -> str:
 @bp.route("/create", methods=["GET", "POST"])
 @auth_required(True, "admin.admin_auth.login")
 @breadcrumbs("Create news")
-def create():
+def create() -> str | BaseResponse:
     form = NewsForm()
     if form.validate_on_submit():
         error = NewsService.create(
-            title=form.title.data,
-            description=form.description.data,
-            content=form.content.data,
+            # DataRequired() guarantees strings; `or ""` narrows the type
+            title=form.title.data or "",
+            description=form.description.data or "",
+            content=form.content.data or "",
             published_at=form.published_at.data,
             image_url=form.image_url.data,
             images=form.images.data,
@@ -81,7 +84,7 @@ def create():
 @bp.route("/update/<_id>", methods=["GET", "POST"])
 @auth_required(True, "admin.admin_auth.login")
 @breadcrumbs("Update news")
-def update(_id):
+def update(_id: str) -> str | BaseResponse:
     data = NewsService.get_by_id(int(_id))
     if not data:
         abort(404, description="News not found")
@@ -89,9 +92,10 @@ def update(_id):
     if form.validate_on_submit():
         error = NewsService.update(
             _id=data.id,
-            title=form.title.data,
-            description=form.description.data,
-            content=form.content.data,
+            # DataRequired() guarantees strings; `or ""` narrows the type
+            title=form.title.data or "",
+            description=form.description.data or "",
+            content=form.content.data or "",
             published_at=form.published_at.data,
             image_url=form.image_url.data,
             images=form.images.data,
@@ -107,7 +111,7 @@ def update(_id):
 @bp.route("/view/<_id>", methods=["GET"])
 @auth_required(True, "admin.admin_auth.login")
 @breadcrumbs("View news")
-def view(_id):
+def view(_id: str) -> str:
     data = NewsService.get_by_id(int(_id))
     if not data:
         abort(404, description="News not found")
@@ -118,8 +122,8 @@ def view(_id):
 
 @bp.route("/remove/<_id>", methods=["DELETE"])
 @auth_required(True, "admin.admin_auth.login")
-def remove(_id):
-    message = NewsService.remove([_id])
+def remove(_id: str) -> tuple[str, int]:
+    message = NewsService.remove([int(_id)])
     if message:
         abort(404, description=message)
     return "", 200
@@ -127,7 +131,7 @@ def remove(_id):
 
 @bp.route("/bulk-remove", methods=["DELETE"])
 @auth_required(True, "admin.admin_auth.login")
-def bulk_remove():
+def bulk_remove() -> tuple[str, int]:
     ids = request.get_json(force=True).get("ids", [])
     message = NewsService.remove(ids)
     if message:
@@ -137,8 +141,8 @@ def bulk_remove():
 
 @bp.route("/resume/<_id>", methods=["PUT"])
 @auth_required(True, "admin.admin_auth.login")
-def resume(_id):
-    message = NewsService.resume([_id])
+def resume(_id: str) -> tuple[str, int]:
+    message = NewsService.resume([int(_id)])
     if message:
         abort(404, description=message)
     return "", 200
@@ -146,7 +150,7 @@ def resume(_id):
 
 @bp.route("/bulk-resume", methods=["PUT"])
 @auth_required(True, "admin.admin_auth.login")
-def bulk_resume():
+def bulk_resume() -> tuple[str, int]:
     ids = request.get_json(force=True).get("ids", [])
     message = NewsService.resume(ids)
     if message:

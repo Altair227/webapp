@@ -11,7 +11,7 @@ bp = Blueprint(
 
 
 @bp.get("/")
-def index():
+def index() -> str:
     page = int(request.args.get("page", 1))
     size = int(request.args.get("size", 25))
     query = request.args.get("search", "").strip()
@@ -24,7 +24,7 @@ def index():
 
 
 @bp.route("/news-<_id>.html", methods=["GET"])
-def view(_id):
+def view(_id: str) -> str:
     data = NewsService.get_by_id(int(_id))
     if not data:
         abort(404, description="News not found")

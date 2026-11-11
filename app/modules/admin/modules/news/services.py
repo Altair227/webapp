@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Any
 
-from sqlalchemy import desc, or_, true
+from sqlalchemy import or_
 
 from app.database import db_session
 from app.models import News
@@ -17,9 +18,9 @@ class NewsService:
         page: int = 1,
         size: int = 25,
         search: str | None = None,
-        field: str = "id",
-        direction: str = "desc",
-    ) -> tuple[int, list[News]]:
+        field: str | None = "id",
+        direction: str | None = "desc",
+    ) -> tuple[int, list[Any]]:
         if size < 1:
             size = 1
         if field not in SORTABLE:

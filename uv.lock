@@ -539,6 +539,18 @@ wheels = [
 ]
 
 [[package]]
+name = "types-wtforms"
+version = "3.3.0.20261104"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markupsafe" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0d/aa/e98cb418d7c9de5ff940a8e3a63992e00ae15432f2746cf085761d284d87/types_wtforms-3.3.0.20261104.tar.gz", hash = "sha256:8f0465275e0656a5787863daa9ca3a075a219404b43ef6b5de155323759a2d0b", size = 20244, upload-time = "2026-11-04T08:14:31.294Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/89/9f/beb0da54cb03e13056239683b57428d58aaca5854915497e29f8ba891320/types_wtforms-3.3.0.20261104-py3-none-any.whl", hash = "sha256:9bddb70c42e48fc6eab5544c0d51d3c89e604dbd0d27842e1ca7f5c7fc80066e", size = 28021, upload-time = "2026-11-04T08:14:30.14Z" },
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.15.0"
 source = { registry = "https://pypi.org/simple" }
@@ -588,6 +600,7 @@ dependencies = [
     { name = "ruff" },
     { name = "sqlalchemy" },
     { name = "sqlalchemy-utils" },
+    { name = "types-wtforms" },
     { name = "typing-extensions" },
     { name = "typing-inspection" },
 ]
@@ -618,6 +631,7 @@ requires-dist = [
     { name = "ruff", specifier = "==0.14.13" },
     { name = "sqlalchemy", specifier = "==2.0.45" },
     { name = "sqlalchemy-utils", specifier = ">=0.42.1" },
+    { name = "types-wtforms", specifier = ">=3.3.0.20261104" },
     { name = "typing-extensions", specifier = "==4.15.0" },
     { name = "typing-inspection", specifier = "==0.4.2" },
 ]
