@@ -3,6 +3,7 @@ from .admin import Admin
 from .admin_data import AdminData
 from .news import News
 from .source_image import SourceImage
+from .source_video import SourceVideo
 from .token import EmailToken
 from .user import User
 from .user_data import UserData
@@ -17,4 +18,5 @@ __all__ = [
     "User",
     "UserData",
     "relations",
+    "SourceVideo",
 ]

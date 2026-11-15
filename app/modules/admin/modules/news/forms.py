@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired, Length, Optional
 from app.modules.admin.components.fields import (
     DateField,
     ImageListField,
+    VideoListField,
     WysiwygField,
 )
 from app.modules.admin.components.validators import EachUrlOrPath, UrlOrPath
@@ -53,6 +54,12 @@ class NewsForm(FlaskForm):
     )
     images = ImageListField(
         label="Photos",
+        validators=[
+            EachUrlOrPath(),
+        ],
+    )
+    videos = VideoListField(
+        label="Videos",
         validators=[
             EachUrlOrPath(),
         ],

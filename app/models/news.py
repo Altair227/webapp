@@ -5,11 +5,12 @@ from sqlalchemy import DateTime, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, SafeDeleteMixin, TimestampMixin
-from .relations import _r_news_source_image
+from .relations import _r_news_source_image, _r_news_source_video
 
 
 if TYPE_CHECKING:
     from .source_image import SourceImage
+    from .source_video import SourceVideo
 
 
 class News(Base, TimestampMixin, SafeDeleteMixin):
@@ -49,4 +50,11 @@ class News(Base, TimestampMixin, SafeDeleteMixin):
         lazy="select",
         passive_deletes=True,
         order_by="SourceImage.id",
+    )
+    videos: Mapped[list["SourceVideo"]] = relationship(
+        "SourceVideo",
+        secondary=_r_news_source_video,
+        lazy="select",
+        passive_deletes=True,
+        order_by="SourceVideo.id",
     )

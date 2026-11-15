@@ -28,15 +28,18 @@
 {% if data.image_url %}
 <hr />
 <h3>Cover image</h3>
-<a class="news-photo d-inline-block" href="{{ data.image_url }}" target="_blank">
+<a
+  class="news-photo d-inline-block"
+  href="{{ data.image_url }}"
+  target="_blank"
+>
   <img
     src="{{ data.image_url }}"
     alt="{{ data.title }}"
     style="max-height: 280px; width: auto"
   />
 </a>
-{% endif %}
-{% if data.images %}
+{% endif %} {% if data.images %}
 <hr />
 <h3>
   Photos
@@ -53,11 +56,15 @@
       target="_blank"
       title="{{ image.url }}"
     >
-      <img src="{{ image.url }}" alt="{{ image.filename or '' }}" loading="lazy" />
+      <img
+        src="{{ image.url }}"
+        alt="{{ image.filename or '' }}"
+        loading="lazy"
+      />
     </a>
     <div class="news-photo-caption text-secondary text-truncate mt-1">
-      {{ image.filename or image.url }}
-      {% if image.size %}· {{ image.size | filesizeformat }}{% endif %}
+      {{ image.filename or image.url }} {% if image.size %}· {{ image.size |
+      filesizeformat }}{% endif %}
     </div>
   </div>
   {% endfor %}

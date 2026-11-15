@@ -72,6 +72,11 @@
     <label class="form-label">{{ form.images.label.text }}</label>
     {{ form.images() }}
   </div>
+  <h3>Additional videos</h3>
+  <div class="mb-3">
+    <label class="form-label">{{ form.videos.label.text }}</label>
+    {{ form.videos() }}
+  </div>
   {% if is_create %}
   <button class="btn btn-primary" type="submit">Create</button>
   {% else %}

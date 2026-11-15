@@ -120,13 +120,14 @@ const selected_urls = (data) => data.files.map(
 
 // div[data-field-type="images"]: one .image-row per image
 // ([input name=images][browse][+][-]), see ImageListWidget
-const image_rows = (box) => {
-    if (box.dataset.imagesBound){
+const multiple_rows = (box, type) => {
+    const bound = type + "sBound";
+    if (box.dataset[bound]){
         return;
     }
-    box.dataset.imagesBound = "true";
+    box.dataset[bound] = "true";
     const max_items = parseInt(box.dataset.maxItems || "0", 10);
-    const rows = () => box.querySelectorAll('.image-row');
+    const rows = () => box.querySelectorAll("." + type + "-row");
 
     const set_url = (row, url) => {
         row.querySelector('input').value = url;
@@ -140,16 +141,16 @@ const image_rows = (box) => {
     };
     const update = () => {
         const full = max_items > 0 && rows().length >= max_items;
-        box.querySelectorAll('[data-image-action="add"]').forEach(btn => btn.disabled = full);
+        box.querySelectorAll('[data-' + type + '-action="add"]').forEach(btn => btn.disabled = full);
     };
 
     box.addEventListener("click", e => {
-        const button = e.target.closest('[data-image-action]');
+        const button = e.target.closest('[data-' + type + '-action]');
         if (!button) {
             return;
         }
         e.preventDefault();
-        const row = button.closest('.image-row');
+        const row = button.closest("." + type + "-row");
         switch (button.dataset.imageAction) {
             case "browse":
                 // several picked files fill this row and new rows after it
@@ -180,6 +181,11 @@ const image_rows = (box) => {
     });
     update();
 };
+
+const image_rows = (box) => multiple_rows(box, 'image');
+const video_rows = (box) => multiple_rows(box, 'video');
+
+
 
 const refresh_view = (_dom) => {
     _dom.querySelectorAll('a[data-modal]').forEach(open_modal);
@@ -220,6 +226,7 @@ const refresh_view = (_dom) => {
     }
 
     _dom.querySelectorAll('div[data-field-type="images"]').forEach(image_rows);
+    _dom.querySelectorAll('div[data-field-type="videos"]').forEach(video_rows);
 
     const filemanagers = _dom.querySelectorAll('button[data-button-type="filemanager"]');
     if (filemanagers.length) {

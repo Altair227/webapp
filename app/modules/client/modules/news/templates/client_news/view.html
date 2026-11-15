@@ -20,8 +20,8 @@
 
   <div class="news-content">{{ item.content | safe }}</div>
 
-  {% set photos = item.images | rejectattr("is_deleted") | list %}
-  {% if photos %}
+  {% set photos = item.images | rejectattr("is_deleted") | list %} {% if photos
+  %}
   <section class="news-gallery mt-5">
     <h3 class="mb-3">Дополнительные фото</h3>
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">

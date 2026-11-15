@@ -14,11 +14,12 @@ from app.models import (
     EmailToken,
     News,
     SourceImage,
+    SourceVideo,
     User,
     UserData,
 )
 from app.models.base import Base
-from app.models.relations import _r_news_source_image
+from app.models.relations import _r_news_source_image, _r_news_source_video
 from app.utils.logger import init_logger
 
 
@@ -48,6 +49,8 @@ MIGRATED_TABLES: list[type[Base] | Table] = [
     User,
     UserData,
     _r_news_source_image,
+    SourceVideo,
+    _r_news_source_video,
 ]
 INCLUDE_TABLES: set[str] = set()
 for _item in MIGRATED_TABLES:

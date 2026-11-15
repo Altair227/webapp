@@ -20,3 +20,18 @@ _r_news_source_image = Table(
         index=True,
     ),
 )
+_r_news_source_video = Table(
+    "_r_news_source_video",
+    Base.metadata,
+    Column(
+        "news_id",
+        ForeignKey("news.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "source_video_id",
+        ForeignKey("source_video.id", ondelete="CASCADE"),
+        primary_key=True,
+        index=True,
+    ),
+)
