@@ -69,6 +69,18 @@
   </div>
   {% endfor %}
 </div>
+{% endif %} {% if data.videos %}
+<hr />
+<h3>
+  Videos
+  <span class="badge text-bg-secondary align-middle fs-6">
+    {{ data.videos | length }}
+  </span>
+</h3>
+<div class="row row-cols-2 row-cols-sm-3 row-cols-lg-4 row-cols-xl-6 g-3">
+  {% for video in data.videos %} {% if video.poster %} {{video.poster}} {% endif
+  %} {% endfor %}
+</div>
 {% endif %}
 <hr />
 <h3>Page content</h3>

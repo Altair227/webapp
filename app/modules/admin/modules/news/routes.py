@@ -74,6 +74,7 @@ def create() -> str | BaseResponse:
             published_at=form.published_at.data,
             image_url=form.image_url.data,
             images=form.images.data,
+            videos=form.videos.data,
         )
         if not error:
             return redirect(url_for("admin.admin_news.index"))
@@ -99,6 +100,7 @@ def update(_id: str) -> str | BaseResponse:
             published_at=form.published_at.data,
             image_url=form.image_url.data,
             images=form.images.data,
+            videos=form.videos.data,
         )
         if not error:
             return redirect(url_for("admin.admin_news.index"))

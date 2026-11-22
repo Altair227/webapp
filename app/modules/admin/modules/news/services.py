@@ -7,6 +7,7 @@ from app.database import db_session
 from app.models import News
 from app.models.base import get_sortable_columns, to_dict
 from app.utils.source_images import get_or_create_images
+from app.utils.source_videos import get_or_create_videos
 
 
 SORTABLE = get_sortable_columns(News)
@@ -51,6 +52,7 @@ class NewsService:
         published_at: datetime | None = None,
         image_url: str | None = None,
         images: list[str] | None = None,
+        videos: list[str] | None = None,
     ) -> str | None:
         data = News(
             title=title,
@@ -62,6 +64,7 @@ class NewsService:
         db_session.add(data)
         try:
             data.images = get_or_create_images(images or [])
+            data.videos = get_or_create_videos(videos or [])
             db_session.commit()
             return None
         except Exception as e:
@@ -81,6 +84,7 @@ class NewsService:
         published_at: datetime | None = None,
         image_url: str | None = None,
         images: list[str] | None = None,
+        videos: list[str] | None = None,
     ) -> str | None:
         data = NewsService.get_by_id(_id)
         if not data:
@@ -91,7 +95,7 @@ class NewsService:
         data.published_at = published_at
         data.image_url = image_url
         try:
-            # replaces links in _r_news_source_image; SourceImage rows stay
+            data.videos = get_or_create_videos(videos or [])
             data.images = get_or_create_images(images or [])
             db_session.commit()
             return None
