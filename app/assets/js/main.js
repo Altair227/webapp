@@ -151,7 +151,8 @@ const multiple_rows = (box, type) => {
         }
         e.preventDefault();
         const row = button.closest("." + type + "-row");
-        switch (button.dataset.imageAction) {
+        const action = type + 'Action';
+        switch (button.dataset[action]) {
             case "browse":
                 // several picked files fill this row and new rows after it
                 get_file_browser().open(data => {
@@ -164,7 +165,7 @@ const multiple_rows = (box, type) => {
                         }
                     });
                     update();
-                }, true);
+                }, type == "image");
                 break;
             case "add":
                 add_row(row).querySelector('input').focus();
@@ -224,7 +225,6 @@ const refresh_view = (_dom) => {
 
         }
     }
-
     _dom.querySelectorAll('div[data-field-type="images"]').forEach(image_rows);
     _dom.querySelectorAll('div[data-field-type="videos"]').forEach(video_rows);
 
