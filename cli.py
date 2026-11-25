@@ -6,6 +6,7 @@ from app.common.types import AdminType, SmallIntEnum
 from app.database import db_session
 from app.models import Admin
 from app.utils.security import generate_password, hash_password
+from app.utils.video_scan import scan_videos, scan_videos_loop
 
 
 def _create_superadmin() -> None:
@@ -49,6 +50,13 @@ def _create_superadmin() -> None:
     print(f"  Password: {password}")
 
 
+def _scan_videos(loop: bool) -> None:
+    if loop:
+        return scan_videos_loop()
+    done, failed = scan_videos()
+    print(f"Scanned videos: {done} done, {failed} failed")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="CLI")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -56,9 +64,20 @@ def main() -> None:
         name="create-superadmin",
         help="Create or update a super admin account",
     )
+    scan_parser = subparsers.add_parser(
+        name="scan-videos",
+        help="Detect type and find posters for new videos (one pass)",
+    )
+    scan_parser.add_argument(
+        "--loop",
+        action="store_true",
+        help="Keep scanning until stopped",
+    )
     args = parser.parse_args()
     if args.command == "create-superadmin":
         return _create_superadmin()
+    if args.command == "scan-videos":
+        return _scan_videos(args.loop)
 
 
 if __name__ == "__main__":

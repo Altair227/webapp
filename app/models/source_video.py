@@ -1,42 +1,17 @@
-import re
-from urllib.parse import parse_qs, urlparse
+from datetime import datetime
 
-from sqlalchemy import Integer, String
+from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
+
+from app.common.types import SmallIntEnum, VideoType
+from app.utils.dummy_image import dummy_image
 
 from .base import Base, SafeDeleteMixin, TimestampMixin
 
 
-def extract_youtube_id(url: str | None) -> str | None:
-    if not url:
-        return None
-    parsed = urlparse(url.strip())
-    host = (
-        (parsed.hostname or "").lower().removeprefix("www.").removeprefix("m.")
-    )
-    path = parsed.path.strip("/")
-    video_id = None
-    if host == "youtu.be":
-        video_id = path.split("/")[0]
-    elif host in ["youtube.com", "music.youtube.com", "youtube-nocookie.com"]:
-        if path == "watch":
-            video_id = parse_qs(parsed.query).get("v", [None])[0]
-        else:
-            parts = path.split("/")
-            if len(parts) >= 2 and parts[0] in [
-                "embed",
-                "shorts",
-                "live",
-                "v",
-            ]:
-                video_id = parts[1]
-    if video_id and re.compile(r"^[A-Za-z0-9_-]{11}$").match(video_id):
-        return video_id
-    return None
-
-
 class SourceVideo(Base, TimestampMixin, SafeDeleteMixin):
     __tablename__ = "source_video"
+    __table_args__ = (SmallIntEnum.create_check_constraint("type", VideoType),)
 
     url: Mapped[str] = mapped_column(
         String(255),
@@ -64,14 +39,43 @@ class SourceVideo(Base, TimestampMixin, SafeDeleteMixin):
     )
     duration: Mapped[int | None] = mapped_column(
         Integer,
+        default=None,
+        nullable=True,
+        comment="",
+    )
+    # None: not detected yet
+    type: Mapped[VideoType | None] = mapped_column(
+        SmallIntEnum(VideoType),
+        default=None,
+        nullable=True,
+        comment="",
+    )
+    # real picture only, the placeholder is never stored (see cover)
+    poster: Mapped[str | None] = mapped_column(
+        String(500),
+        default=None,
+        nullable=True,
+        comment="",
+    )
+    attempts: Mapped[int] = mapped_column(
+        Integer,
         default=0,
+        server_default="0",
+        nullable=False,
+        comment="",
+    )
+    next_attempt_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        default=None,
         nullable=True,
         comment="",
     )
 
     @property
-    def poster(self) -> str | None:
-        video_id = extract_youtube_id(self.url)
-        if not video_id:
-            return None
-        return f"https://i.ytimg.com/vi/{video_id}/mqdefault.jpg"
+    def cover(self) -> str:
+        """Saved poster, or a placeholder when there is none."""
+        if self.poster:
+            return self.poster
+        if self.type == VideoType.OTHER:
+            return dummy_image(self.filename or "Video")
+        return dummy_image("Processing")

@@ -5,6 +5,7 @@ services:
     build:
       context: ..
       dockerfile: docker/python.Dockerfile
+      target: app
     working_dir: /srv
     volumes:
       - ..:/srv
@@ -26,6 +27,30 @@ services:
         condition: service_healthy
       mailpit:
         condition: service_started
+    networks:
+      - crm-network
+
+  # no auto-reload: restart it after changing the scan code
+  video-scan:
+    build:
+      context: ..
+      dockerfile: docker/python.Dockerfile
+      target: video-scan
+    working_dir: /srv
+    restart: unless-stopped
+    # let a running ffmpeg finish
+    stop_grace_period: 90s
+    volumes:
+      - ..:/srv
+    env_file:
+      - ../app/.env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - crm-network
 

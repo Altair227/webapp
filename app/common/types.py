@@ -21,6 +21,13 @@ class EmailTokenType(IntEnum):
     PASSWORD_RESET = 1
 
 
+class VideoType(IntEnum):
+    YOUTUBE = 0
+    VIMEO = 1
+    LOCAL = 2
+    OTHER = 3
+
+
 class SmallIntEnum(TypeDecorator[IntEnum]):
     """
     SQLAlchemy TypeDecorator для IntEnum -> SMALLINT маппинга.

@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_FILE = Path(__file__).parent / ".env"
+UPLOAD_DIR = BASE_DIR / "web" / "upload"
 load_dotenv(str(ENV_FILE))
 
 

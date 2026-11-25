@@ -4,7 +4,14 @@
     "http://localhost:9000",
     "http://127.0.0.1:9000"
   ],
-  "maxUploadFileSize": "16mb",
+  "maxUploadFileSize": "512mb",
+  "extensions": [
+    "jpg", "jpeg", "png", "gif", "bmp", "ico", "svg", "webp", "tif", "psd", "ai",
+    "ttf", "txt", "css", "ini", "xml", "csv", "rtf", "pdf",
+    "doc", "docx", "xls", "xlsx", "pps", "ppt", "pptx", "odp",
+    "zip", "rar", "7z", "gz", "tar",
+    "mp4", "webm", "mov", "mkv", "avi", "3gp"
+  ],
   "sources": {
     "default": {
       "title": "Upload",

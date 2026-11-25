@@ -1,4 +1,4 @@
-.PHONY: help info env-file check-env check-runtime format migrate-create migrate-up migrate-down up down logs install create-superadmin
+.PHONY: help info env-file check-env check-runtime format migrate-create migrate-up migrate-down up down logs logs-scan install create-superadmin
 
 .DEFAULT_GOAL := help
 
@@ -86,6 +86,9 @@ down: env-file ## Остановить и удалить контейнеры
 
 logs: env-file ## Логи приложения в реальном времени
 	$(COMPOSE) logs -f app
+
+logs-scan: env-file ## Логи фонового скана видео в реальном времени
+	$(COMPOSE) logs -f video-scan
 
 create-superadmin: check-runtime ## Создать или обновить суперадмина
 	@$(APP) python cli.py create-superadmin

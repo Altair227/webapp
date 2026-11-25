@@ -1,19 +1,14 @@
 import logging
-from pathlib import Path
 
 from flask import Flask, Response, render_template, send_from_directory
 from werkzeug.exceptions import HTTPException
 
 import app.modules as app_pkg
-from app.config import get_config
+from app.config import UPLOAD_DIR, get_config
 from app.database import shutdown_session
 from app.utils.logger import init_logger
 from app.utils.mailer import get_mailer
 from app.utils.modules import register_child_blueprints
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent  # .../app
-UPLOAD_DIR = BASE_DIR / "web" / "upload"
 
 
 def create_app() -> Flask:
