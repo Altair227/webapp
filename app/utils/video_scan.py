@@ -106,6 +106,7 @@ def _run(command: list[str], timeout: int) -> str:
             text=True,
             errors="replace",
             timeout=timeout,
+            check=False,
         )
     except subprocess.TimeoutExpired as e:
         raise ScanError(f"{command[0]}: timeout {timeout} s") from e
@@ -223,7 +224,7 @@ def _process(
         return True
     try:
         meta = _fetch(video_id, video_type, url)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         attempts += 1
         next_at = None
         if attempts < MAX_ATTEMPTS:
@@ -263,6 +264,7 @@ def _next_batch(
         )
         .filter(
             SourceVideo.id > after_id,
+            # pylint: disable-next=no-member
             SourceVideo.is_deleted.is_(False),
             SourceVideo.poster.is_(None),
             or_(
@@ -314,7 +316,7 @@ def scan_videos_loop() -> None:
     while not stop.is_set():
         try:
             scan_videos(stop)
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             # e.g. Postgres restarts or a migration is not applied yet
             logger.exception("Scan failed")
         stop.wait(LOOP_PAUSE)

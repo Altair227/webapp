@@ -108,3 +108,13 @@ file_template = "%%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d%%(seco
 # SQLAlchemy builds func.now/func.count/... dynamically, pylint reports
 # them as not callable (false positive)
 disable = ["not-callable", "missing-module-docstring", "missing-class-docstring", "missing-function-docstring"]
+
+[tool.pylint.typecheck]
+# Alembic fills alembic.op at runtime, pylint reports op.add_column etc. as
+# missing (false positive)
+ignored-modules = ["alembic.op"]
+
+[tool.pylint.basic]
+# names required by Alembic in migrations/versions
+good-names = ["i", "j", "k", "ex", "Run", "_", "revision", "down_revision", "branch_labels", "depends_on"]
+module-rgx = "([a-z_][a-z0-9_]*|\\d{8}_\\d{6}_[a-z0-9_]+)$"
