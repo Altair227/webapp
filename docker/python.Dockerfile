@@ -1,4 +1,4 @@
-FROM python:3.14-slim AS base
+FROM python:3.14-slim AS runtime
 
 COPY --from=ghcr.io/astral-sh/uv:0.9.5 /uv /usr/local/bin/uv
 
@@ -12,16 +12,22 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
 
 WORKDIR /srv
 
+FROM runtime AS deps
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project
 
-# background video scan: ffmpeg makes posters of uploaded videos
-FROM base AS video-scan
+# before the Python dependencies: changes in pyproject.toml or uv.lock must
+# not download ffmpeg again
+FROM runtime AS ffmpeg
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg \
     && rm -rf /var/lib/apt/lists/*
+
+# background video scan: ffmpeg makes posters of uploaded videos
+FROM ffmpeg AS video-scan
+COPY --from=deps /opt/venv /opt/venv
 CMD ["python", "cli.py", "scan-videos", "--loop"]
 
 # last stage: built when no target is given
-FROM base AS app
+FROM deps AS app
 CMD ["python", "run.py"]
