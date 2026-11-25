@@ -36,6 +36,9 @@ services:
       context: ..
       dockerfile: docker/python.Dockerfile
       target: video-scan
+      args:
+        # make up DEBIAN_MIRROR=... when deb.debian.org is slow
+        DEBIAN_MIRROR: "${DEBIAN_MIRROR:-http://deb.debian.org/debian}"
     working_dir: /srv
     restart: unless-stopped
     # let a running ffmpeg finish

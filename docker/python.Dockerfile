@@ -19,7 +19,11 @@ RUN uv sync --frozen --no-install-project
 # before the Python dependencies: changes in pyproject.toml or uv.lock must
 # not download ffmpeg again
 FROM runtime AS ffmpeg
-RUN apt-get update \
+# closer Debian mirror, e.g. http://ftp.de.debian.org/debian
+ARG DEBIAN_MIRROR=http://deb.debian.org/debian
+RUN sed -i "s|http://deb.debian.org/debian$|${DEBIAN_MIRROR}|" \
+        /etc/apt/sources.list.d/debian.sources \
+    && apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
